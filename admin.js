@@ -63,7 +63,8 @@ function renderCard(id, pedido) {
     if (pedido.status === "Preparando") card.classList.add('preparando');
     if (pedido.status === "Finalizado") card.classList.add('finalizado');
     
-    // Lista de itens
+    const ehEntrega = pedido.metodo && pedido.metodo.toLowerCase() === 'entrega';
+
     let itensHtml = "";
     pedido.itens.forEach(i => {
         itensHtml += `• ${i.name}<br>`;
@@ -75,9 +76,10 @@ function renderCard(id, pedido) {
             <span>💰 R$ ${pedido.total.toFixed(2).replace('.', ',')}</span>
         </div>
         <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">
-            🛵 ${pedido.metodo === 'entrega' ? 'Entrega' : 'Retirada'} | 💳 ${pedido.pagamento}
+            🛵 ${ehEntrega ? 'Entrega' : 'Retirada'} | 💳 ${pedido.pagamento}
         </div>
-        ${pedido.metodo === 'entrega' ? `<div style="font-size: 0.8rem; color: #ccc; margin-bottom: 8px;">📍 ${pedido.endereco}</div>` : ''}
+        
+        ${ehEntrega ? `<div style="font-size: 0.8rem; color: #ccc; margin-bottom: 8px;">📍 ${pedido.endereco}</div>` : ''}
         
         <div class="order-items">${itensHtml}</div>
         
