@@ -25,6 +25,13 @@ const statsDiv = document.getElementById('stats');
 const q = query(collection(db, "pedidos"), orderBy("data", "desc"));
 
 onSnapshot(q, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+            const alertSound = new Audio('https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3');
+            alertSound.play().catch(e => console.log("Áudio bloqueado: Interaja com a página primeiro."));
+        }
+    });
+
     colPendente.innerHTML = "";
     colPreparando.innerHTML = "";
     colFinalizado.innerHTML = "";
@@ -44,15 +51,9 @@ onSnapshot(q, (snapshot) => {
         renderCard(id, pedido);
     });
 
-    // Atualiza o resumo no topo da tela
-    statsDiv.innerText = `Total de Pedidos: ${contadorPedidos} | Faturamento Finalizado: R$ ${totalVendasHoje.toFixed(2).replace('.', ',')}`;
-
-    // Lógica do Som de Alerta: Toca se um novo documento for adicionado
-    snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-            alertSound.play().catch(e => console.log("Aguardando interação para tocar som."));
-        }
-    });
+    if (statsDiv) {
+        statsDiv.innerText = `Total de Pedidos: ${contadorPedidos} | Faturamento Finalizado: R$ ${totalVendasHoje.toFixed(2).replace('.', ',')}`;
+    }
 });
 
 // 3. PARA CRIAR O CARD DO PEDIDO
