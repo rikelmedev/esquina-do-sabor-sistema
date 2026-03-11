@@ -1,17 +1,19 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// ✅ NOVA CONFIGURAÇÃO DE PRODUÇÃO
 const firebaseConfig = {
-  apiKey: "AIzaSyDdDYKgcxXOr2hlkWYdmMM6P6_3HPrz1Io",
-  authDomain: "esquinadosabor-erp.firebaseapp.com",
-  projectId: "esquinadosabor-erp",
-  storageBucket: "esquinadosabor-erp.firebasestorage.app",
-  messagingSenderId: "924407371283",
-  appId: "1:924407371283:web:95a149da9ad781b3a311e6"
+  apiKey: "AIzaSyDs17Az4-kB--3LdBs1KwPNDrEr37jYkCU",
+  authDomain: "esquina-sabor-real.firebaseapp.com",
+  projectId: "esquina-sabor-real",
+  storageBucket: "esquina-sabor-real.firebasestorage.app",
+  messagingSenderId: "423163019859",
+  appId: "1:423163019859:web:31d00ff2004ec7e8bb7ca6"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 
 // 1. ANIMAÇÃO
 const observer = new IntersectionObserver((entries) => {
