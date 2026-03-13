@@ -67,7 +67,6 @@ onSnapshot(collection(db, "mesas"), (snapshot) => {
         const mesa = docSnap.data();
         if (mesa.status === "ocupada") faturamentoMesasAberto += (mesa.total || 0);
         
-        // Renderiza no Mapa de Mesas do Admin se a div existir
         if (mesaGridAdmin) renderMesaAdmin(docSnap.id, mesa);
     });
     atualizarDashboard();
@@ -91,9 +90,31 @@ function atualizarDashboard() {
             </div>
         `;
     }
-}
+}   
 
-// --- 4. FUNÇÕES DE OPERAÇÃO (PDV) ---
+onSnapshot(collection(db, "estoque"), (snapshot) => {
+    const listaEstoque = document.getElementById('lista-estoque');
+    if (!listaEstoque) return;
+    
+    listaEstoque.innerHTML = "";
+    snapshot.forEach(docSnap => {
+        const item = docSnap.data();
+        const corStatus = item.quantidade < 10 ? '#ef4444' : '#10b981'; 
+        
+        listaEstoque.innerHTML += `
+            <div class="kpi-card">
+                <span class="kpi-label">${item.nome}</span>
+                <span class="kpi-value" style="color: ${corStatus}">${item.quantidade} ${item.unidade}</span>
+                <div style="margin-top: 10px; display: flex; gap: 5px;">
+                    <button onclick="ajustarEstoque('${docSnap.id}', 1)" style="background: #334155; border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">+</button>
+                    <button onclick="ajustarEstoque('${docSnap.id}', -1)" style="background: #334155; border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">-</button>
+                </div>
+            </div>
+        `;
+    });
+});
+
+// --- (PDV) ---
 
 // Função para permitir lançar pedido direto do computador
 window.lancarPedidoManual = async () => {
@@ -174,5 +195,19 @@ window.excluirPedido = async (id) => {
         } catch (e) {
             console.error("Erro ao excluir:", e);
         }
+    }
+};
+
+window.ajustarEstoque = async (id, mudanca) => {
+    const ref = doc(db, "estoque", id);
+    const snap = await getDoc(ref);
+    await updateDoc(ref, { quantidade: snap.data().quantidade + mudanca });
+};
+
+window.adicionarInsumo = async () => {
+    const nome = prompt("Nome do Insumo (ex: Pão de Hambúrguer):");
+    const qtd = Number(prompt("Quantidade inicial:"));
+    if (nome && !isNaN(qtd)) {
+        await addDoc(collection(db, "estoque"), { nome, quantidade: qtd, unidade: "un" });
     }
 };

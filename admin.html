@@ -6,21 +6,20 @@
     <title>PDV Esquina do Sabor</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        body { background: #0f172a; display: flex; min-height: 100vh; overflow: hidden; }
         
-        /* Menu Lateral */
-        .sidebar { width: 260px; background: #1e293b; border-right: 1px solid #334155; display: flex; flex-direction: column; padding: 20px; }
-        .sidebar-brand { font-size: 1.5rem; color: #3b82f6; margin-bottom: 40px; text-align: center; }
-        .nav-link { padding: 12px 15px; color: #94a3b8; text-decoration: none; border-radius: 10px; margin-bottom: 5px; cursor: pointer; transition: 0.3s; }
-        .nav-link:hover, .nav-link.active { background: #3b82f6; color: white; }
+        body {
+    background: radial-gradient(circle at top left, #1e293b 0%, #0f172a 100%); 
+    display: flex; 
+    min-height: 100vh; 
+    overflow: hidden; 
+    color: #f8fafc;
+}
 
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
-        .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeIn 0.3s; }
-
-        .mesa-grid-admin { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.kpi-card, .column {
+    background: rgba(30, 41, 59, 0.7) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
     </style>
 </head>
 <body>
@@ -32,6 +31,7 @@
             <div class="nav-link" onclick="switchView('v-mesas')">🍽️ Gestão de Mesas</div>
             <div class="nav-link" onclick="switchView('v-delivery')">🛵 Delivery & Retirada</div>
             <div class="nav-link" onclick="switchView('v-config')">⚙️ Configurações</div>
+            <div class="nav-link" onclick="switchView('v - estoque', this)">📦 Estoque</div>
         </nav>
     </aside>
 
@@ -59,6 +59,16 @@
                 <div class="column"><h2>✅ Finalizados</h2><div id="col-finalizado"></div></div>
             </div>
         </section>
+
+        <selection id="v-estoque" class="view-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h1>Controle de Insumos</h1>" 
+        <button onclick="adicionarInsumo()" class="finalize-order-btn" style="width: auto; padding: 10px 20px; background: #3b82f6;">+ Novo Item</button>
+    </div>
+
+    <div class="kpi-grid" id="lista-estoque">
+          </div>
+    </section>
 
         <section id="v-config" class="view-section">
             <h1>Conectar Dispositivos</h1>
