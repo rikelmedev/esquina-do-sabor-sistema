@@ -35,33 +35,73 @@ function renderMesa(id, mesa) {
     mesaGrid.appendChild(div);
 }
 
-// Função para abrir o modal e decidir se o número é editável
+// Função para decidir se o número é editável
 let mesaAtualId = null;
+
 
 function abrirMesa(id, mesa) {
     mesaAtualId = id;
-    const inputNumero = document.getElementById('input-numero-mesa');
+    const itensContainer = document.getElementById('itens-consumo');
+    const areaProdutos = document.getElementById('area-produtos');
     const areaAcoes = document.getElementById('area-acoes');
-    
-    document.getElementById('modal-titulo-mesa').innerText = `Gestão: Mesa ${mesa.numero}`;
-    inputNumero.value = mesa.numero;
 
-    // Lógica de Trava: Só edita se estiver livre
-    if (mesa.status === 'ocupada') {
-        inputNumero.disabled = true;
-        areaAcoes.innerHTML = `
-            <button class="finalize-order-btn" style="background: var(--color-yellow-flame); color: #000;">+ Adicionar Pedido</button>
-            <button class="finalize-order-btn" style="margin-top: 10px;">Fechar Conta</button>
-        `;
+    document.getElementById('modal-titulo-mesa').innerText = `Mesa ${mesa.numero}`;
+    
+    // Listar itens já consumidos
+    let htmlConsumo = `<p style="color: #888;">Consumo Total: <b>R$ ${mesa.total.toFixed(2)}</b></p><ul style="font-size: 0.9rem; padding-left: 15px;">`;
+    if (mesa.itens && mesa.itens.length > 0) {
+        mesa.itens.forEach(item => htmlConsumo += `<li>${item}</li>`);
     } else {
-        inputNumero.disabled = false;
-        areaAcoes.innerHTML = `
-            <button class="finalize-order-btn" onclick="confirmarOcuparMesa()" style="background: #2ecc71; color: white;">Abrir Mesa (Ocupar)</button>
-        `;
+        htmlConsumo += `<li>Nenhum item lançado</li>`;
+    }
+    htmlConsumo += "</ul>";
+    itensContainer.innerHTML = htmlConsumo;
+
+    if (mesa.status === 'ocupada') {
+        areaProdutos.style.display = 'block';
+        areaAcoes.innerHTML = `<button onclick="fecharContaMesa()" class="finalize-order-btn" style="background: var(--color-red-fire);">Fechar Conta e Liberar</button>`;
+    } else {
+        areaProdutos.style.display = 'none';
+        areaAcoes.innerHTML = `<button onclick="confirmarOcuparMesa()" class="finalize-order-btn" style="background: #2ecc71;">Ocupar Mesa</button>`;
     }
 
     document.getElementById('mesa-modal').style.display = 'block';
 }
+
+// FUNÇÃO PARA LANÇAR ITEM
+window.adicionarItemMesa = async () => {
+    const select = document.getElementById('select-produto');
+    const valor = parseFloat(select.value);
+    const texto = select.options[select.selectedIndex].text;
+    if (!valor) return;
+
+    const mesaRef = doc(db, "mesas", mesaAtualId);
+    try {
+        const snap = await getDoc(mesaRef);
+        const dados = snap.data();
+        
+        await updateDoc(mesaRef, {
+            total: (dados.total || 0) + valor,
+            itens: [...(dados.itens || []), texto] 
+        });
+        select.selectedIndex = 0;
+    } catch (e) { console.error(e); }
+};
+
+// FUNÇÃO PARA FECHAR CONTA
+window.fecharContaMesa = async () => {
+    if (!confirm("Deseja fechar a conta e liberar a mesa?")) return;
+    
+    const mesaRef = doc(db, "mesas", mesaAtualId);
+    try {
+        await updateDoc(mesaRef, {
+            status: "livre",
+            total: 0,
+            itens: [] // Limpa o consumo
+        });
+        fecharModal();
+    } catch (e) { console.error(e); }
+};
 
 async function confirmarOcuparMesa() {
     const novoNumero = document.getElementById('input-numero-mesa').value;
