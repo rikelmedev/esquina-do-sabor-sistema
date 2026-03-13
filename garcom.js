@@ -14,8 +14,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const mesaGrid = document.getElementById('mesa-grid');
+let mesaAtualId = null;
 
-// 1. STATUS DAS MESAS
+// 1. ESCUTAR STATUS DAS MESAS
 onSnapshot(collection(db, "mesas"), (snapshot) => {
     mesaGrid.innerHTML = "";
     snapshot.forEach((docSnap) => {
@@ -35,11 +36,8 @@ function renderMesa(id, mesa) {
     mesaGrid.appendChild(div);
 }
 
-// Função para decidir se o número é editável
-let mesaAtualId = null;
-
-
-function abrirMesa(id, mesa) {
+// 2. ABRIR GESTÃO DA MESA
+window.abrirMesa = (id, mesa) => {
     mesaAtualId = id;
     const itensContainer = document.getElementById('itens-consumo');
     const areaProdutos = document.getElementById('area-produtos');
@@ -47,8 +45,7 @@ function abrirMesa(id, mesa) {
 
     document.getElementById('modal-titulo-mesa').innerText = `Mesa ${mesa.numero}`;
     
-    // Listar itens já consumidos
-    let htmlConsumo = `<p style="color: #888;">Consumo Total: <b>R$ ${mesa.total.toFixed(2)}</b></p><ul style="font-size: 0.9rem; padding-left: 15px;">`;
+    let htmlConsumo = `<p style="color: #888;">Consumo Total: <b>R$ ${(mesa.total || 0).toFixed(2)}</b></p><ul style="font-size: 0.9rem; padding-left: 15px;">`;
     if (mesa.itens && mesa.itens.length > 0) {
         mesa.itens.forEach(item => htmlConsumo += `<li>${item}</li>`);
     } else {
@@ -66,9 +63,26 @@ function abrirMesa(id, mesa) {
     }
 
     document.getElementById('mesa-modal').style.display = 'block';
-}
+};
 
-// FUNÇÃO PARA LANÇAR ITEM
+// 3. OCUPAR MESA
+window.confirmarOcuparMesa = async () => {
+    const novoNumero = document.getElementById('input-numero-mesa').value;
+    if(!novoNumero) return alert("Digite o número da mesa!");
+
+    const mesaRef = doc(db, "mesas", mesaAtualId);
+    try {
+        await updateDoc(mesaRef, {
+            numero: Number(novoNumero),
+            status: "ocupada"
+        });
+        window.fecharModal();
+    } catch (e) {
+        console.error("Erro ao ocupar mesa:", e);
+    }
+};
+
+// 4. LANÇAR ITEM
 window.adicionarItemMesa = async () => {
     const select = document.getElementById('select-produto');
     const valor = parseFloat(select.value);
@@ -88,7 +102,7 @@ window.adicionarItemMesa = async () => {
     } catch (e) { console.error(e); }
 };
 
-// FUNÇÃO PARA FECHAR CONTA
+// 5. FECHAR CONTA
 window.fecharContaMesa = async () => {
     if (!confirm("Deseja fechar a conta e liberar a mesa?")) return;
     
@@ -97,23 +111,13 @@ window.fecharContaMesa = async () => {
         await updateDoc(mesaRef, {
             status: "livre",
             total: 0,
-            itens: [] // Limpa o consumo
+            itens: []
         });
-        fecharModal();
+        window.fecharModal();
     } catch (e) { console.error(e); }
 };
 
-async function confirmarOcuparMesa() {
-    const novoNumero = document.getElementById('input-numero-mesa').value;
-    const mesaRef = doc(db, "mesas", mesaAtualId);
-
-    try {
-        await updateDoc(mesaRef, {
-            numero: Number(novoNumero),
-            status: "ocupada"
-        });
-        fecharModal();
-    } catch (e) {
-        console.error("Erro ao ocupar mesa:", e);
-    }
-}
+// 6. AUXILIARES
+window.fecharModal = () => {
+    document.getElementById('mesa-modal').style.display = 'none';
+};
