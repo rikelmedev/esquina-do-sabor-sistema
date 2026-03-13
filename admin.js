@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ✅ NOVA CONFIGURAÇÃO DE PRODUÇÃO
 const firebaseConfig = {
   apiKey: "AIzaSyDs17Az4-kB--3LdBs1KwPNDrEr37jYkCU",
   authDomain: "esquina-sabor-real.firebaseapp.com",
@@ -14,18 +13,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-
 const colPendente = document.getElementById('col-pendente');
 const colPreparando = document.getElementById('col-preparando');
 const colFinalizado = document.getElementById('col-finalizado');
-const alertSound = document.getElementById('alert-sound');
 const statsDiv = document.getElementById('stats');
 
-// 2. ESCUTAR PEDIDOS EM TEMPO REAL
-// Consulta que busca a coleção pedidos em ordem de data
-const q = query(collection(db, "pedidos"), orderBy("data", "desc"));
+let faturamentoFinalizado = 0;
+let faturamentoMesasAberto = 0;
 
-onSnapshot(q, (snapshot) => {
+// 1. ESCUTAR PEDIDOS EM TEMPO REAL (Delivery/Retirada)
+const qPedidos = query(collection(db, "pedidos"), orderBy("data", "desc"));
+
+onSnapshot(qPedidos, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
         if (change.type === "added") {
             const alertSound = new Audio('https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3');
@@ -37,7 +36,7 @@ onSnapshot(q, (snapshot) => {
     colPreparando.innerHTML = "";
     colFinalizado.innerHTML = "";
 
-    let totalVendasHoje = 0;
+    faturamentoFinalizado = 0;
     let contadorPedidos = 0;
 
     snapshot.forEach((docSnap) => {
@@ -46,18 +45,42 @@ onSnapshot(q, (snapshot) => {
         
         contadorPedidos++;
         if (pedido.status === "Finalizado") {
-            totalVendasHoje += pedido.total;
+            faturamentoFinalizado += pedido.total;
         }
 
         renderCard(id, pedido);
     });
-
-    if (statsDiv) {
-        statsDiv.innerText = `Total de Pedidos: ${contadorPedidos} | Faturamento Finalizado: R$ ${totalVendasHoje.toFixed(2).replace('.', ',')}`;
-    }
+    
+    atualizarDashboard(contadorPedidos);
 });
 
-// 3. PARA CRIAR O CARD DO PEDIDO
+// 2. ESCUTAR CONSUMO DAS MESAS (Presencial)
+onSnapshot(collection(db, "mesas"), (snapshot) => {
+    faturamentoMesasAberto = 0;
+    snapshot.forEach((docSnap) => {
+        const mesa = docSnap.data();
+        if (mesa.status === "ocupada") {
+            faturamentoMesasAberto += (mesa.total || 0);
+        }
+    });
+    atualizarDashboard();
+});
+
+// 3. FUNÇÃO PARA ATUALIZAR O CABEÇALHO
+function atualizarDashboard(contagem = null) {
+    if (statsDiv) {
+        const totalGeral = faturamentoFinalizado + faturamentoMesasAberto;
+        statsDiv.innerHTML = `
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; font-weight: bold; flex-wrap: wrap;">
+                <span style="color: #2ecc71;">💰 Caixa (Finalizados): R$ ${faturamentoFinalizado.toFixed(2).replace('.', ',')}</span>
+                <span style="color: #FFC300;">🍽️ Em Mesa: R$ ${faturamentoMesasAberto.toFixed(2).replace('.', ',')}</span>
+                <span style="color: white; border-left: 1px solid #444; padding-left: 20px;">🚀 Total Geral: R$ ${totalGeral.toFixed(2).replace('.', ',')}</span>
+            </div>
+        `;
+    }
+}
+
+// 4. PARA CRIAR O CARD DO PEDIDO
 function renderCard(id, pedido) {
     const card = document.createElement('div');
     card.classList.add('order-card');
