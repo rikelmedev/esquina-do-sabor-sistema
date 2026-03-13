@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDs17Az4-kB--3LdBs1KwPNDrEr37jYkCU",
@@ -13,60 +13,66 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// --- 1. SELEÇÃO DE ELEMENTOS DO DOM ---
 const colPendente = document.getElementById('col-pendente');
 const colPreparando = document.getElementById('col-preparando');
 const colFinalizado = document.getElementById('col-finalizado');
 const statsDiv = document.getElementById('stats');
+const mesaGridAdmin = document.getElementById('mesa-grid-admin');
 
+// --- 2. LÓGICA DE NAVEGAÇÃO (COLOQUE AQUI) ---
+window.switchView = (viewId, el) => {
+    // Remove o estado ativo de todas as seções e links
+    document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    
+    // Ativa a seção correspondente
+    document.getElementById(viewId).classList.add('active');
+    
+    // Se o elemento foi passado (pelo clique), marca como ativo no menu
+    if (el) el.classList.add('active');
+};
+
+// Configura a URL para os garçons conectarem
+const configUrl = document.getElementById('url-garcom');
+if (configUrl) {
+    configUrl.innerText = window.location.origin + "/garcom.html";
+}
+
+// --- 3. GESTÃO FINANCEIRA E REAL-TIME ---
 let faturamentoFinalizado = 0;
 let faturamentoMesasAberto = 0;
 
-// 1. ESCUTAR PEDIDOS EM TEMPO REAL (Delivery/Retirada)
-const qPedidos = query(collection(db, "pedidos"), orderBy("data", "desc"));
-
-onSnapshot(qPedidos, (snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-            const alertSound = new Audio('https://notificationsounds.com/storage/sounds/file-sounds-1150-pristine.mp3');
-            alertSound.play().catch(e => console.log("Áudio bloqueado: Interaja com a página primeiro."));
-        }
-    });
-
+// Escutar pedidos de Delivery/Retirada
+onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snapshot) => {
     colPendente.innerHTML = "";
     colPreparando.innerHTML = "";
     colFinalizado.innerHTML = "";
-
     faturamentoFinalizado = 0;
-    let contadorPedidos = 0;
 
     snapshot.forEach((docSnap) => {
         const pedido = docSnap.data();
-        const id = docSnap.id;
-        
-        contadorPedidos++;
-        if (pedido.status === "Finalizado") {
-            faturamentoFinalizado += pedido.total;
-        }
-
-        renderCard(id, pedido);
-    });
-    
-    atualizarDashboard(contadorPedidos);
-});
-
-// 2. ESCUTAR CONSUMO DAS MESAS (Presencial)
-onSnapshot(collection(db, "mesas"), (snapshot) => {
-    faturamentoMesasAberto = 0;
-    snapshot.forEach((docSnap) => {
-        const mesa = docSnap.data();
-        if (mesa.status === "ocupada") {
-            faturamentoMesasAberto += (mesa.total || 0);
-        }
+        if (pedido.status === "Finalizado") faturamentoFinalizado += (pedido.total || 0);
+        renderCard(docSnap.id, pedido);
     });
     atualizarDashboard();
 });
 
-// 3. FUNÇÃO PARA ATUALIZAR
+// Escutar mesas para o Salão
+onSnapshot(collection(db, "mesas"), (snapshot) => {
+    faturamentoMesasAberto = 0;
+    if (mesaGridAdmin) mesaGridAdmin.innerHTML = "";
+
+    snapshot.forEach((docSnap) => {
+        const mesa = docSnap.data();
+        if (mesa.status === "ocupada") faturamentoMesasAberto += (mesa.total || 0);
+        
+        // Renderiza no Mapa de Mesas do Admin se a div existir
+        if (mesaGridAdmin) renderMesaAdmin(docSnap.id, mesa);
+    });
+    atualizarDashboard();
+});
+
 function atualizarDashboard() {
     if (statsDiv) {
         const totalGeral = faturamentoFinalizado + faturamentoMesasAberto;
@@ -76,18 +82,42 @@ function atualizarDashboard() {
                 <span class="kpi-value" style="color: #10b981;">R$ ${faturamentoFinalizado.toFixed(2).replace('.', ',')}</span>
             </div>
             <div class="kpi-card">
-                <span class="kpi-label">🍽️ Consumo em Mesas</span>
+                <span class="kpi-label">🍽️ Em Mesa</span>
                 <span class="kpi-value" style="color: #f59e0b;">R$ ${faturamentoMesasAberto.toFixed(2).replace('.', ',')}</span>
             </div>
-            <div class="kpi-card" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-color: #3b82f6;">
-                <span class="kpi-label" style="color: #60a5fa;">🚀 Faturamento Total</span>
+            <div class="kpi-card" style="border-color: #3b82f6;">
+                <span class="kpi-label" style="color: #60a5fa;">🚀 Total</span>
                 <span class="kpi-value">R$ ${totalGeral.toFixed(2).replace('.', ',')}</span>
             </div>
         `;
     }
 }
 
-// 4. PARA CRIAR O CARD DO PEDIDO
+// --- 4. FUNÇÕES DE OPERAÇÃO (PDV) ---
+
+// Função para permitir lançar pedido direto do computador
+window.lancarPedidoManual = async () => {
+    const cliente = prompt("Nome do Cliente/Mesa:");
+    if (!cliente) return;
+
+    try {
+        await addDoc(collection(db, "pedidos"), {
+            cliente: cliente,
+            status: "Pendente",
+            data: serverTimestamp(),
+            total: 0,
+            itens: [],
+            metodo: "Balcão",
+            pagamento: "A combinar"
+        });
+        alert("Pedido lançado no balcão!");
+    } catch (e) {
+        console.error("Erro ao lançar pedido:", e);
+    }
+};
+
+
+//  PARA CRIAR O CARD DO PEDIDO
 function renderCard(id, pedido) {
     const card = document.createElement('div');
     card.classList.add('order-card');
