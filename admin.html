@@ -3,87 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Administrativo - Esquina do Sabor</title>
-    <link rel="stylesheet" href="styles.css"> 
-    
+    <title>Dashboard ERP - Esquina do Sabor</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        /* Para organizar as colunas de pedidos */
-        .admin-container { 
-            display: flex; 
+        
+        body { background: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        
+        .dashboard-header { padding: 30px 0; border-bottom: 1px solid #1e293b; margin-bottom: 30px; }
+        
+        .kpi-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
             gap: 20px; 
-            padding: 20px; 
-            overflow-x: auto; 
-            min-height: 80vh; 
+            margin-bottom: 40px; 
         }
+        
+        .kpi-card { 
+            background: #1e293b; 
+            padding: 24px; 
+            border-radius: 16px; 
+            border: 1px solid #334155; 
+            transition: transform 0.3s;
+        }
+        .kpi-card:hover { transform: translateY(-5px); border-color: #3b82f6; }
+        .kpi-label { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-value { font-size: 2rem; font-weight: 700; margin-top: 10px; display: block; }
+        
+        .admin-container { display: flex; gap: 24px; overflow-x: auto; padding-bottom: 20px; }
         .column { 
-            background: #1a1a1a; 
-            min-width: 320px; 
-            border-radius: 10px; 
-            padding: 15px; 
-            border: 1px solid #333; 
+            background: #1e293b; 
+            min-width: 350px; 
+            border-radius: 20px; 
+            padding: 20px; 
+            border: 1px solid #334155;
+            max-height: 80vh;
+            overflow-y: auto;
         }
-        .column h2 { 
-            font-size: 1.5rem; 
-            text-align: center; 
-            margin-bottom: 20px; 
-            color: var(--color-yellow-flame); 
-        }
+        .column h2 { font-size: 1.2rem; margin-bottom: 20px; color: #f1f5f9; display: flex; align-items: center; gap: 10px; }
+        
+        /* Estilo dos Cards de Pedido igual à referência */
         .order-card { 
-            background: #2a2a2a; 
-            border-radius: 8px; 
-            padding: 15px; 
-            margin-bottom: 15px; 
-            border-left: 5px solid var(--color-red-fire); 
+            background: #0f172a; 
+            border-radius: 12px; 
+            padding: 16px; 
+            margin-bottom: 16px; 
+            border: 1px solid #334155;
+            position: relative;
         }
-        /* Cores diferentes para cada estágio do pedido */
-        .order-card.preparando { border-left-color: #3498db; }
-        .order-card.finalizado { border-left-color: var(--whatsapp-green); opacity: 0.7; }
-        
-        .order-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; }
-        .order-items { font-size: 0.9rem; margin-bottom: 10px; border-top: 1px solid #444; padding-top: 10px; }
-        
-        .admin-btns { display: flex; gap: 5px; }
-        .admin-btns button { 
-            flex: 1; 
-            padding: 8px; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            color: white; 
-        }
-        .btn-accept { background: #3498db; }
-        .btn-done { background: var(--whatsapp-green); }
-        .btn-cancel { background: #e74c3c; }
+        .status-indicator { width: 4px; height: 100%; position: absolute; left: 0; top: 0; border-radius: 12px 0 0 12px; }
     </style>
 </head>
-<body style="background: #111;">
+<body>
 
-    <header class="header">
-        <div class="container" style="text-align: center;">
-            <h1>Painel de Pedidos</h1>
-            <div id="stats" style="color: #ccc; margin-top: 10px;">Aguardando novos pedidos...</div>
+    <header class="dashboard-header">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="font-size: 1.8rem;">Olá, Rikelme! 👋</h1>
+                    <p style="color: #94a3b8;">Veja como está a operação da Esquina do Sabor hoje.</p>
+                </div>
+                <img src="Imagens/Logo.png" style="height: 50px;">
+            </div>
         </div>
     </header>
 
-    <div class="admin-container">
-        <div class="column">
-            <h2>📥 Pendentes</h2>
-            <div id="col-pendente"></div>
-        </div>
+    <main class="container">
+        <div id="stats" class="kpi-grid">
+            </div>
 
-        <div class="column">
-            <h2>👨‍🍳 Preparando</h2>
-            <div id="col-preparando"></div>
+        <div class="admin-container">
+            <div class="column">
+                <h2>🟡 Pendentes</h2>
+                <div id="col-pendente"></div>
+            </div>
+            <div class="column">
+                <h2>🔵 Preparando</h2>
+                <div id="col-preparando"></div>
+            </div>
+            <div class="column">
+                <h2>🟢 Finalizados</h2>
+                <div id="col-finalizado"></div>
+            </div>
         </div>
-
-        <div class="column">
-            <h2>✅ Finalizados</h2>
-            <div id="col-finalizado"></div>
-        </div>
-    </div>
-
-    <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3"></audio>
+    </main>
 
     <script type="module" src="admin.js"></script>
 </body>

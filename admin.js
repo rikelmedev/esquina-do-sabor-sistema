@@ -66,15 +66,22 @@ onSnapshot(collection(db, "mesas"), (snapshot) => {
     atualizarDashboard();
 });
 
-// 3. FUNÇÃO PARA ATUALIZAR O CABEÇALHO
-function atualizarDashboard(contagem = null) {
+// 3. FUNÇÃO PARA ATUALIZAR
+function atualizarDashboard() {
     if (statsDiv) {
         const totalGeral = faturamentoFinalizado + faturamentoMesasAberto;
         statsDiv.innerHTML = `
-            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; font-weight: bold; flex-wrap: wrap;">
-                <span style="color: #2ecc71;">💰 Caixa (Finalizados): R$ ${faturamentoFinalizado.toFixed(2).replace('.', ',')}</span>
-                <span style="color: #FFC300;">🍽️ Em Mesa: R$ ${faturamentoMesasAberto.toFixed(2).replace('.', ',')}</span>
-                <span style="color: white; border-left: 1px solid #444; padding-left: 20px;">🚀 Total Geral: R$ ${totalGeral.toFixed(2).replace('.', ',')}</span>
+            <div class="kpi-card">
+                <span class="kpi-label">💰 Caixa (Finalizados)</span>
+                <span class="kpi-value" style="color: #10b981;">R$ ${faturamentoFinalizado.toFixed(2).replace('.', ',')}</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-label">🍽️ Consumo em Mesas</span>
+                <span class="kpi-value" style="color: #f59e0b;">R$ ${faturamentoMesasAberto.toFixed(2).replace('.', ',')}</span>
+            </div>
+            <div class="kpi-card" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-color: #3b82f6;">
+                <span class="kpi-label" style="color: #60a5fa;">🚀 Faturamento Total</span>
+                <span class="kpi-value">R$ ${totalGeral.toFixed(2).replace('.', ',')}</span>
             </div>
         `;
     }
