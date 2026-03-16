@@ -82,7 +82,6 @@ window.atualizarDashboard = (totalDePedidos = 0) => {
 
     const totalGeral = faturamentoFinalizado + faturamentoMesasAberto;
     
-    // LINHA DE 4 KPIs
     statsDiv.innerHTML = `
         <div class="kpi-card" style="padding: 20px; border-top: 3px solid #3b82f6;">
             <span class="kpi-label">Faturamento Geral</span>
@@ -105,19 +104,32 @@ window.atualizarDashboard = (totalDePedidos = 0) => {
     const ctxRosca = document.getElementById('chartRosca');
     if (ctxRosca) {
         if (chartRoscaInstance) chartRoscaInstance.destroy();
+
+        const totalVendas = faturamentoMesasAberto + faturamentoFinalizado;
+        const temVenda = totalVendas > 0;
+
         chartRoscaInstance = new Chart(ctxRosca, {
             type: 'doughnut',
             data: {
-                labels: ['Mesa', 'Delivery/Caixa'],
+                labels: temVenda ? ['Mesa', 'Delivery/Caixa'] : ['Aguardando Vendas'],
                 datasets: [{
-                    data: [faturamentoMesasAberto, faturamentoFinalizado],
-                    backgroundColor: ['#f59e0b', '#10b981'],
+                    data: temVenda ? [faturamentoMesasAberto, faturamentoFinalizado] : [1],
+                    backgroundColor: temVenda ? ['#f59e0b', '#10b981'] : ['#334155'],
                     borderWidth: 0,
                     hoverOffset: 4
                 }]
             },
-            options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } } }
+            options: { 
+                cutout: '75%', 
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { position: 'bottom', labels: { color: '#94a3b8' } },
+                    tooltip: { enabled: temVenda } 
+                } 
+            }
         });
+        
+        ctxRosca.style.height = '180px';
     }
 
     // Inicializar Gráfico de Linha
