@@ -36,49 +36,78 @@ if (configUrl) {
     configUrl.innerText = window.location.origin + "/garcom.html";
 }
 
-// GESTÃO FINANCEIRA E REAL-TIME ---
+// GESTÃO FINANCEIRA  ---
+
 let faturamentoFinalizado = 0;
 let faturamentoMesasAberto = 0;
 
-// Escutar pedidos de Delivery/Retirada
+let totalDinheiro = 0;
+let totalPix = 0;
+let totalCredito = 0;
+let totalDebito = 0;
+let totalPedidosDia = 0;
+
+// Escutar pedidos de Delivery/Retirada e Salão Fechado
 onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snapshot) => {
     colPendente.innerHTML = "";
     colPreparando.innerHTML = "";
     colFinalizado.innerHTML = "";
+    
     faturamentoFinalizado = 0;
+    totalDinheiro = 0;
+    totalPix = 0;
+    totalCredito = 0;
+    totalDebito = 0;
+    totalPedidosDia = 0;
 
     snapshot.forEach((docSnap) => {
         const pedido = docSnap.data();
-        if (pedido.status === "Finalizado") faturamentoFinalizado += (pedido.total || 0);
+        
+        if (pedido.status === "Finalizado") {
+            faturamentoFinalizado += (pedido.total || 0);
+            totalPedidosDia++;
+            
+            const pag = pedido.pagamento ? pedido.pagamento.toLowerCase() : "";
+            if (pag.includes("dinheiro")) totalDinheiro += pedido.total;
+            else if (pag.includes("pix")) totalPix += pedido.total;
+            else if (pag.includes("crédito") || pag.includes("credito")) totalCredito += pedido.total;
+            else if (pag.includes("débito") || pag.includes("debito")) totalDebito += pedido.total;
+        }
+        
         renderCard(docSnap.id, pedido);
     });
+    
     atualizarDashboard();
 });
 
-// Escutar mesas para o Salão
+// Escutar mesas para o Salão 
 onSnapshot(collection(db, "mesas"), (snapshot) => {
     faturamentoMesasAberto = 0;
+    const mesaGridAdmin = document.getElementById('mesa-grid-admin');
     if (mesaGridAdmin) mesaGridAdmin.innerHTML = "";
 
     snapshot.forEach((docSnap) => {
         const mesa = docSnap.data();
         if (mesa.status === "ocupada") faturamentoMesasAberto += (mesa.total || 0);
-        
         if (mesaGridAdmin) renderMesaAdmin(docSnap.id, mesa);
     });
     atualizarDashboard();
-});
+});;
 
 document.getElementById('data-hoje').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
 let chartLinhaInstance = null;
 let chartRoscaInstance = null;
 
-window.atualizarDashboard = (totalDePedidos = 0) => {
+window.atualizarDashboard = () => {
+    const statsDiv = document.getElementById('stats');
     if (!statsDiv) return;
 
     const totalGeral = faturamentoFinalizado + faturamentoMesasAberto;
     
+    // Calcula o Ticket Médio 
+    const ticketMedio = totalPedidosDia > 0 ? (faturamentoFinalizado / totalPedidosDia) : 0;
+
     statsDiv.innerHTML = `
         <div class="kpi-card" style="padding: 20px; border-top: 3px solid #3b82f6;">
             <span class="kpi-label">Faturamento Geral</span>
@@ -86,14 +115,14 @@ window.atualizarDashboard = (totalDePedidos = 0) => {
         </div>
         <div class="kpi-card" style="padding: 20px; border-top: 3px solid #8b5cf6;">
             <span class="kpi-label">Pedidos Hoje</span>
-            <span class="kpi-value" style="color: #f8fafc; font-size: 1.6rem;">${totalDePedidos}</span>
+            <span class="kpi-value" style="color: #f8fafc; font-size: 1.6rem;">${totalPedidosDia}</span>
         </div>
         <div class="kpi-card" style="padding: 20px; border-top: 3px solid #f59e0b;">
-            <span class="kpi-label">Em Mesa</span>
-            <span class="kpi-value" style="color: #f59e0b; font-size: 1.6rem;">R$ ${faturamentoMesasAberto.toFixed(2).replace('.', ',')}</span>
+            <span class="kpi-label">Ticket Médio</span>
+            <span class="kpi-value" style="color: #f59e0b; font-size: 1.6rem;">R$ ${ticketMedio.toFixed(2).replace('.', ',')}</span>
         </div>
         <div class="kpi-card" style="padding: 20px; border-top: 3px solid #10b981;">
-            <span class="kpi-label">Delivery / Caixa</span>
+            <span class="kpi-label">Caixa (Finalizados)</span>
             <span class="kpi-value" style="color: #10b981; font-size: 1.6rem;">R$ ${faturamentoFinalizado.toFixed(2).replace('.', ',')}</span>
         </div>
     `;
@@ -101,17 +130,18 @@ window.atualizarDashboard = (totalDePedidos = 0) => {
     const ctxRosca = document.getElementById('chartRosca');
     if (ctxRosca) {
         if (chartRoscaInstance) chartRoscaInstance.destroy();
-
-        const totalVendas = faturamentoMesasAberto + faturamentoFinalizado;
+        
+        const totalVendas = totalDinheiro + totalPix + totalCredito + totalDebito;
         const temVenda = totalVendas > 0;
 
         chartRoscaInstance = new Chart(ctxRosca, {
             type: 'doughnut',
             data: {
-                labels: temVenda ? ['Mesa', 'Delivery/Caixa'] : ['Aguardando Vendas'],
+                labels: temVenda ? ['Pix', 'Dinheiro', 'Crédito', 'Débito'] : ['Aguardando Vendas'],
                 datasets: [{
-                    data: temVenda ? [faturamentoMesasAberto, faturamentoFinalizado] : [1],
-                    backgroundColor: temVenda ? ['#f59e0b', '#10b981'] : ['#334155'],
+                    data: temVenda ? [totalPix, totalDinheiro, totalCredito, totalDebito] : [1],
+                    // Cores modernas adaptadas ao seu tema escuro
+                    backgroundColor: temVenda ? ['#8b5cf6', '#10b981', '#3b82f6', '#f59e0b'] : ['#334155'], 
                     borderWidth: 0,
                     hoverOffset: 4
                 }]
@@ -129,7 +159,6 @@ window.atualizarDashboard = (totalDePedidos = 0) => {
         ctxRosca.style.height = '180px';
     }
 
-    // Inicializar Gráfico de Linha
     const ctxLinha = document.getElementById('chartLinha');
     if (ctxLinha && !chartLinhaInstance) {
         chartLinhaInstance = new Chart(ctxLinha, {
@@ -137,8 +166,8 @@ window.atualizarDashboard = (totalDePedidos = 0) => {
             data: {
                 labels: ['18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
                 datasets: [{
-                    label: 'Vendas',
-                    data: [120, 350, 480, 200, 150, 90], 
+                    label: 'Vendas Simuladas',
+                    data: [120, 350, 480, 200, 150, 90],
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.2)',
                     fill: true,
