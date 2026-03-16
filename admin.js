@@ -224,6 +224,9 @@ window.removerItemBalcao = (index) => {
 
 window.finalizarPedidoBalcao = async () => {
     const cliente = document.getElementById('input-cliente-balcao').value;
+    const pagamento = document.getElementById('pagamento-balcao').value;
+    
+    
     if (!cliente) return alert("Preencha o nome do cliente!");
     if (carrinhoBalcao.length === 0) return alert("A comanda está vazia!");
 
@@ -236,7 +239,7 @@ window.finalizarPedidoBalcao = async () => {
             total: totalBalcao,
             itens: carrinhoBalcao,
             metodo: "Balcão",
-            pagamento: "A combinar no Caixa"
+            pagamento: pagamento
         });
 
         const qtdLanches = carrinhoBalcao.filter(i => i.name.includes("X-")).length;
@@ -332,6 +335,30 @@ window.adicionarInsumo = async () => {
 
 // GESTÃO DE MESAS (SUPER ADMIN) ---
 
+window.adicionarNovaMesa = async () => {
+    const numeroStr = prompt("Qual é o número da nova mesa que deseja adicionar?");
+    if (!numeroStr) return;
+
+    const numeroMesa = parseInt(numeroStr);
+    
+    if (isNaN(numeroMesa) || numeroMesa <= 0) {
+        return alert("Por favor, digite um número válido para a mesa.");
+    }
+
+    try {
+        await addDoc(collection(db, "mesas"), {
+            numero: numeroMesa,
+            status: "livre",
+            total: 0,
+            itens: []
+        });
+        alert(`Mesa ${numeroMesa} adicionada com sucesso ao salão!`);
+    } catch (e) {
+        console.error("Erro ao adicionar mesa:", e);
+        alert("Erro ao criar a mesa. Verifique a conexão.");
+    }
+};
+
 window.renderMesaAdmin = (id, mesa) => {
     const div = document.createElement('div');
     const corBorda = mesa.status === 'ocupada' ? '#ef4444' : '#10b981';
@@ -377,11 +404,20 @@ window.abrirMesaAdmin = (id, mesa) => {
     htmlConsumo += `</div><div style="border-top: 1px solid #334155; padding-top: 10px; text-align: right; font-size: 1.2rem;">Total: <b style="color: #f59e0b;">R$ ${(mesa.total || 0).toFixed(2).replace('.', ',')}</b></div>`;
     consumoContainer.innerHTML = htmlConsumo;
 
-    // Define quais botões o Admin pode ver dependendo do status da mesa
     if (mesa.status === 'ocupada') {
         areaProdutos.style.display = 'block';
-        areaAcoes.innerHTML = `<button onclick="fecharContaMesaAdmin()" class="finalize-order-btn" style="background: #ef4444; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Encerrar Mesa e Liberar</button>`;
+        areaAcoes.innerHTML = `
+            <select id="pagamento-mesa-admin" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; margin-bottom: 10px;">
+                <option value="Dinheiro">💵 Dinheiro</option>
+                <option value="Pix">💠 Pix</option>
+                <option value="Cartão de Crédito">💳 Cartão de Crédito</option>
+                <option value="Cartão de Débito">💳 Cartão de Débito</option>
+            </select>
+            <button onclick="fecharContaMesaAdmin()" class="finalize-order-btn" style="background: #ef4444; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Encerrar Mesa e Liberar</button>
+        `;
+
     } else {
+
         areaProdutos.style.display = 'none';
         areaAcoes.innerHTML = `<button onclick="ocuparMesaAdmin()" class="finalize-order-btn" style="background: #10b981; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Ocupar Mesa Agora</button>`;
     }
@@ -395,9 +431,32 @@ window.ocuparMesaAdmin = async () => {
 };
 
 window.fecharContaMesaAdmin = async () => {
-    if (!confirm("Tem certeza que deseja fechar a conta e liberar a mesa?")) return;
-    try { await updateDoc(doc(db, "mesas", mesaAdminAtualId), { status: "livre", total: 0, itens: [] }); fecharModalMesaAdmin(); } 
-    catch (e) { console.error(e); }
+    if (!confirm("Tem certeza que deseja fechar a conta e liberar a mesa? (O valor irá para o caixa)")) return;
+    
+    const mesaRef = doc(db, "mesas", mesaAdminAtualId);
+    const pagamento = document.getElementById('pagamento-mesa-admin').value; 
+    
+    try {
+        const snap = await getDoc(mesaRef);
+        const dadosMesa = snap.data();
+
+        if (dadosMesa.total > 0) {
+            await addDoc(collection(db, "pedidos"), {
+                cliente: `Mesa ${dadosMesa.numero}`,
+                status: "Finalizado",
+                data: serverTimestamp(),
+                total: dadosMesa.total,
+                itens: dadosMesa.itens ? dadosMesa.itens.map(nome => ({ name: nome, price: 0 })) : [],
+                metodo: "Salão (Mesa)",
+                pagamento: pagamento 
+            });
+        }
+
+        await updateDoc(mesaRef, { status: "livre", total: 0, itens: [] });
+        fecharModalMesaAdmin();
+        alert("Conta fechada! O valor foi adicionado ao seu Caixa.");
+        
+    } catch (e) { console.error("Erro ao fechar mesa:", e); }
 };
 
 window.adicionarItemMesaAdmin = async () => {

@@ -89,10 +89,13 @@
         <section id="v-mesas" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h1 style="margin: 0;">Mapa de Mesas</h1>
-                <button onclick="lancarPedidoManual()" style="padding: 12px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">+ Lançar Pedido Balcão</button>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="adicionarNovaMesa()" style="padding: 12px 20px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">+ Nova Mesa</button>
+                    <button onclick="lancarPedidoManual()" style="padding: 12px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">+ Lançar Pedido Balcão</button>
+                </div>
             </div>
             <div id="mesa-grid-admin" class="mesa-grid-admin"></div>
-        </section>
+        </section
 
         <section id="v-delivery" class="view-section">
             <h1 style="margin-bottom: 20px;">Pedidos de Saída</h1>
@@ -142,6 +145,13 @@
                 <div id="lista-itens-balcao" style="font-size: 0.95rem; margin-bottom: 15px; color: #f8fafc;"></div>
                 <div style="border-top: 1px solid #334155; padding-top: 10px; text-align: right; font-size: 1.2rem; color: #f8fafc;">Total: <b style="color: #10b981;">R$ <span id="total-balcao">0.00</span></b></div>
             </div>
+
+               <select id="pagamento-balcao" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; margin-bottom: 15px;">
+                <option value="Dinheiro">💵 Dinheiro</option>
+                <option value="Pix">💠 Pix</option>
+                <option value="Cartão de Crédito">💳 Cartão de Crédito</option>
+                <option value="Cartão de Débito">💳 Cartão de Débito</option>
+            </select>
 
             <button onclick="finalizarPedidoBalcao()" style="background: #10b981; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">✅ Confirmar e Enviar para Cozinha</button>
         </div>
