@@ -332,3 +332,38 @@ window.adicionarInsumo = async () => {
         await addDoc(collection(db, "estoque"), { nome, quantidade: qtd, unidade: "un" });
     }
 };
+
+// --- FUNÇÃO PARA AS MESAS NO PAINEL ADMIN ---
+window.renderMesaAdmin = (id, mesa) => {
+    const div = document.createElement('div');
+    
+    const corBorda = mesa.status === 'ocupada' ? '#ef4444' : '#10b981';
+    const corFundo = mesa.status === 'ocupada' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
+    
+    div.style.cssText = `
+        background: ${corFundo};
+        border: 2px solid ${corBorda};
+        border-radius: 12px; 
+        height: 120px; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center; 
+        color: #f8fafc;
+        cursor: pointer;
+        transition: transform 0.2s;
+    `;
+    
+    div.innerHTML = `
+        <span style="font-size: 1.5rem; font-weight: bold;">MESA ${mesa.numero}</span>
+        <span style="font-size: 0.8rem; text-transform: uppercase; color: ${corBorda};">${mesa.status}</span>
+        ${mesa.status === 'ocupada' ? `<span style="color: #f59e0b; margin-top: 5px; font-weight: bold;">R$ ${(mesa.total || 0).toFixed(2).replace('.', ',')}</span>` : ''}
+    `;
+    
+    // Efeito de clique simples
+    div.onmouseover = () => div.style.transform = 'scale(1.05)';
+    div.onmouseout = () => div.style.transform = 'scale(1)';
+    
+    const grid = document.getElementById('mesa-grid-admin');
+    if (grid) grid.appendChild(div);
+};
