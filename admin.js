@@ -72,25 +72,74 @@ onSnapshot(collection(db, "mesas"), (snapshot) => {
     atualizarDashboard();
 });
 
-function atualizarDashboard() {
-    if (statsDiv) {
-        const totalGeral = faturamentoFinalizado + faturamentoMesasAberto;
-        statsDiv.innerHTML = `
-            <div class="kpi-card">
-                <span class="kpi-label">💰 Caixa (Finalizados)</span>
-                <span class="kpi-value" style="color: #10b981;">R$ ${faturamentoFinalizado.toFixed(2).replace('.', ',')}</span>
-            </div>
-            <div class="kpi-card">
-                <span class="kpi-label">🍽️ Em Mesa</span>
-                <span class="kpi-value" style="color: #f59e0b;">R$ ${faturamentoMesasAberto.toFixed(2).replace('.', ',')}</span>
-            </div>
-            <div class="kpi-card" style="border-color: #3b82f6;">
-                <span class="kpi-label" style="color: #60a5fa;">🚀 Total</span>
-                <span class="kpi-value">R$ ${totalGeral.toFixed(2).replace('.', ',')}</span>
-            </div>
-        `;
+document.getElementById('data-hoje').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+let chartLinhaInstance = null;
+let chartRoscaInstance = null;
+
+window.atualizarDashboard = (totalDePedidos = 0) => {
+    if (!statsDiv) return;
+
+    const totalGeral = faturamentoFinalizado + faturamentoMesasAberto;
+    
+    // LINHA DE 4 KPIs
+    statsDiv.innerHTML = `
+        <div class="kpi-card" style="padding: 20px; border-top: 3px solid #3b82f6;">
+            <span class="kpi-label">Faturamento Geral</span>
+            <span class="kpi-value" style="color: #f8fafc; font-size: 1.6rem;">R$ ${totalGeral.toFixed(2).replace('.', ',')}</span>
+        </div>
+        <div class="kpi-card" style="padding: 20px; border-top: 3px solid #8b5cf6;">
+            <span class="kpi-label">Pedidos Hoje</span>
+            <span class="kpi-value" style="color: #f8fafc; font-size: 1.6rem;">${totalDePedidos}</span>
+        </div>
+        <div class="kpi-card" style="padding: 20px; border-top: 3px solid #f59e0b;">
+            <span class="kpi-label">Em Mesa</span>
+            <span class="kpi-value" style="color: #f59e0b; font-size: 1.6rem;">R$ ${faturamentoMesasAberto.toFixed(2).replace('.', ',')}</span>
+        </div>
+        <div class="kpi-card" style="padding: 20px; border-top: 3px solid #10b981;">
+            <span class="kpi-label">Delivery / Caixa</span>
+            <span class="kpi-value" style="color: #10b981; font-size: 1.6rem;">R$ ${faturamentoFinalizado.toFixed(2).replace('.', ',')}</span>
+        </div>
+    `;
+
+    const ctxRosca = document.getElementById('chartRosca');
+    if (ctxRosca) {
+        if (chartRoscaInstance) chartRoscaInstance.destroy();
+        chartRoscaInstance = new Chart(ctxRosca, {
+            type: 'doughnut',
+            data: {
+                labels: ['Mesa', 'Delivery/Caixa'],
+                datasets: [{
+                    data: [faturamentoMesasAberto, faturamentoFinalizado],
+                    backgroundColor: ['#f59e0b', '#10b981'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } } }
+        });
     }
-}   
+
+    // Inicializar Gráfico de Linha
+    const ctxLinha = document.getElementById('chartLinha');
+    if (ctxLinha && !chartLinhaInstance) {
+        chartLinhaInstance = new Chart(ctxLinha, {
+            type: 'line',
+            data: {
+                labels: ['18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+                datasets: [{
+                    label: 'Vendas',
+                    data: [120, 350, 480, 200, 150, 90], 
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#64748b' } } }, plugins: { legend: { display: false } } }
+        });
+    }
+};
 
 onSnapshot(collection(db, "estoque"), (snapshot) => {
     const listaEstoque = document.getElementById('lista-estoque');

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDV Esquina do Sabor</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-
         body {
             background: radial-gradient(circle at top left, #1e293b 0%, #0f172a 100%); 
             display: flex; 
@@ -62,8 +62,53 @@
     <main class="main-content">
         
         <section id="v-dashboard" class="view-section active">
-            <h1>Visão Geral</h1>
-            <div id="stats" class="kpi-grid"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <div>
+                    <h1 style="font-size: 1.8rem; margin: 0;">Visão Geral</h1>
+                    <p id="data-hoje" style="color: #94a3b8; font-size: 0.9rem; margin: 5px 0 0 0;">Carregando data...</p>
+                </div>
+            </div>
+
+            <div id="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 25px;">
+                <div class="kpi-card" style="padding: 20px;">
+                    <h3 style="color: #f8fafc; font-size: 1.1rem; margin-bottom: 15px;">Vendas Diárias</h3>
+                    <canvas id="chartLinha" style="max-height: 250px;"></canvas>
+                </div>
+                <div class="kpi-card" style="padding: 20px; display: flex; flex-direction: column; align-items: center;">
+                    <h3 style="color: #f8fafc; font-size: 1.1rem; margin-bottom: 15px; width: 100%;">Resumo de Receita</h3>
+                    <div style="position: relative; width: 80%; max-width: 200px;">
+                        <canvas id="chartRosca"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="kpi-card" style="padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <h3 style="color: #f8fafc; font-size: 1.1rem;">Pratos Mais Vendidos</h3>
+                    </div>
+                    <div id="lista-populares" style="color: #94a3b8; font-size: 0.9rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 5px;"><span>🍔 X-Tudo</span> <span style="color: #f8fafc; font-weight: bold;">12 Pedidos</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 5px;"><span>🍟 Batata (Inteira)</span> <span style="color: #f8fafc; font-weight: bold;">8 Pedidos</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><span>🥤 Heineken</span> <span style="color: #f8fafc; font-weight: bold;">5 Pedidos</span></div>
+                    </div>
+                </div>
+                
+                <div class="kpi-card" style="padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                        <h3 style="color: #f8fafc; font-size: 1.1rem;">Estoque em Alerta</h3>
+                        <a href="#" onclick="switchView('v-estoque')" style="color: #ef4444; text-decoration: none; font-size: 0.9rem;">Ver Estoque &rarr;</a>
+                    </div>
+                    <div id="lista-estoque-alerta" style="color: #94a3b8; font-size: 0.9rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding: 10px; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; border-radius: 4px;">
+                            <span style="color: #f8fafc;">Pão de Hambúrguer</span> <span style="color: #ef4444; font-weight: bold;">Acabando</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section id="v-mesas" class="view-section">
@@ -98,7 +143,8 @@
                 <code id="url-garcom" style="display: block; background: #0f172a; padding: 15px; margin-top: 10px; border-radius: 8px; color: #3b82f6;"></code>
             </div>
         </section>
-         <div id="modal-balcao" class="modal">
+
+        <div id="modal-balcao" class="modal">
             <div class="modal-content" style="background: #1e293b; border: 1px solid #334155;">
                 <span class="close-button" onclick="fecharModalBalcao()" style="color: #94a3b8;">&times;</span>
                 <h2 style="color: #f8fafc; font-size: 1.5rem; margin-bottom: 20px;">Lançar Pedido (Balcão)</h2>
