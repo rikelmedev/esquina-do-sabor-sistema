@@ -98,6 +98,43 @@
                 <code id="url-garcom" style="display: block; background: #0f172a; padding: 15px; margin-top: 10px; border-radius: 8px; color: #3b82f6;"></code>
             </div>
         </section>
+         <div id="modal-balcao" class="modal">
+            <div class="modal-content" style="background: #1e293b; border: 1px solid #334155;">
+                <span class="close-button" onclick="fecharModalBalcao()" style="color: #94a3b8;">&times;</span>
+                <h2 style="color: #f8fafc; font-size: 1.5rem; margin-bottom: 20px;">Lançar Pedido (Balcão)</h2>
+                
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <input type="text" id="input-cliente-balcao" placeholder="Nome do Cliente (Ex: João Silva)" 
+                           style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px;">
+                </div>
+
+                <div class="input-group" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <select id="select-produto-balcao" style="flex: 1; padding: 12px; background: #0f172a; color: white; border: 1px solid #3b82f6; border-radius: 8px;">
+                        <option value="">Escolha um produto...</option>
+                        <optgroup label="🍔 LANCHES">
+                            <option value="19.00">X-Burguer</option>
+                            <option value="20.00">X-Salada</option>
+                            <option value="28.00">X-Tudo</option>
+                        </optgroup>
+                        <optgroup label="🥤 BEBIDAS">
+                            <option value="6.00">Refrigerante Lata</option>
+                            <option value="10.00">Cerveja Heineken</option>
+                        </optgroup>
+                    </select>
+                    <button onclick="adicionarItemBalcao()" style="background: #3b82f6; color: white; border: none; padding: 0 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">+</button>
+                </div>
+
+                <div id="itens-balcao" style="background: #0f172a; padding: 15px; border-radius: 8px; margin-bottom: 20px; min-height: 100px;">
+                    <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px;">ITENS DA COMANDA:</p>
+                    <div id="lista-itens-balcao" style="font-size: 0.95rem; margin-bottom: 15px;"></div>
+                    <div style="border-top: 1px solid #334155; padding-top: 10px; text-align: right; font-size: 1.2rem;">
+                        Total: <b style="color: #10b981;">R$ <span id="total-balcao">0.00</span></b>
+                    </div>
+                </div>
+
+                <button onclick="finalizarPedidoBalcao()" class="finalize-order-btn" style="background: #10b981; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">✅ Confirmar e Enviar para Cozinha</button>
+            </div>
+        </div>
 
     </main>
 

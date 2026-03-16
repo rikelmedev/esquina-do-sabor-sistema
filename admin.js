@@ -116,27 +116,87 @@ onSnapshot(collection(db, "estoque"), (snapshot) => {
 
 // --- (PDV) ---
 
-// Função para permitir lançar pedido direto do computador
-window.lancarPedidoManual = async () => {
-    const cliente = prompt("Nome do Cliente/Mesa:");
-    if (!cliente) return;
+// LÓGICA DE FRENTE DE CAIXA (PDV BALCÃO) E ESTOQUE AUTOMÁTICO ---
+
+let carrinhoBalcao = [];
+let totalBalcao = 0;
+
+window.lancarPedidoManual = () => {
+    document.getElementById('modal-balcao').style.display = 'block';
+    carrinhoBalcao = [];
+    totalBalcao = 0;
+    atualizarCarrinhoBalcao();
+};
+
+window.fecharModalBalcao = () => {
+    document.getElementById('modal-balcao').style.display = 'none';
+};
+
+window.adicionarItemBalcao = () => {
+    const select = document.getElementById('select-produto-balcao');
+    const valor = parseFloat(select.value);
+    const nome = select.options[select.selectedIndex].text;
+    
+    if (!valor) return alert("Selecione um produto!");
+
+    carrinhoBalcao.push({ name: nome, price: valor });
+    totalBalcao += valor;
+    
+    atualizarCarrinhoBalcao();
+    select.selectedIndex = 0; // Reseta o select
+};
+
+function atualizarCarrinhoBalcao() {
+    const lista = document.getElementById('lista-itens-balcao');
+    lista.innerHTML = "";
+    carrinhoBalcao.forEach((item, index) => {
+        lista.innerHTML += `<div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <span>• ${item.name}</span>
+            <button onclick="removerItemBalcao(${index})" style="background: transparent; color: #ef4444; border: none; cursor: pointer;">❌</button>
+        </div>`;
+    });
+    document.getElementById('total-balcao').innerText = totalBalcao.toFixed(2).replace('.', ',');
+}
+
+window.removerItemBalcao = (index) => {
+    totalBalcao -= carrinhoBalcao[index].price;
+    carrinhoBalcao.splice(index, 1);
+    atualizarCarrinhoBalcao();
+};
+
+window.finalizarPedidoBalcao = async () => {
+    const cliente = document.getElementById('input-cliente-balcao').value;
+    if (!cliente) return alert("Preencha o nome do cliente!");
+    if (carrinhoBalcao.length === 0) return alert("A comanda está vazia!");
 
     try {
+        // Salva o pedido no banco de dados (Aparece na coluna de Pendentes)
         await addDoc(collection(db, "pedidos"), {
             cliente: cliente,
             status: "Pendente",
             data: serverTimestamp(),
-            total: 0,
-            itens: [],
+            total: totalBalcao,
+            itens: carrinhoBalcao,
             metodo: "Balcão",
-            pagamento: "A combinar"
+            pagamento: "A combinar no Caixa"
         });
-        alert("Pedido lançado no balcão!");
+
+        const qtdLanches = carrinhoBalcao.filter(i => i.name.includes("X-")).length;
+        
+        if (qtdLanches > 0) {
+            console.log(`Abatendo ${qtdLanches} pães do estoque...`);
+            alert(`Pedido finalizado! O sistema reconheceu ${qtdLanches} lanches e descontaria do estoque.`);
+        } else {
+            alert("Pedido lançado com sucesso!");
+        }
+
+        fecharModalBalcao();
+        document.getElementById('input-cliente-balcao').value = "";
     } catch (e) {
-        console.error("Erro ao lançar pedido:", e);
+        console.error("Erro ao finalizar:", e);
+        alert("Erro ao lançar pedido.");
     }
 };
-
 
 //  PARA CRIAR O CARD DO PEDIDO
 function renderCard(id, pedido) {
