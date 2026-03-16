@@ -335,30 +335,6 @@ window.adicionarInsumo = async () => {
 
 // GESTÃO DE MESAS (SUPER ADMIN) ---
 
-window.adicionarNovaMesa = async () => {
-    const numeroStr = prompt("Qual é o número da nova mesa que deseja adicionar?");
-    if (!numeroStr) return;
-
-    const numeroMesa = parseInt(numeroStr);
-    
-    if (isNaN(numeroMesa) || numeroMesa <= 0) {
-        return alert("Por favor, digite um número válido para a mesa.");
-    }
-
-    try {
-        await addDoc(collection(db, "mesas"), {
-            numero: numeroMesa,
-            status: "livre",
-            total: 0,
-            itens: []
-        });
-        alert(`Mesa ${numeroMesa} adicionada com sucesso ao salão!`);
-    } catch (e) {
-        console.error("Erro ao adicionar mesa:", e);
-        alert("Erro ao criar a mesa. Verifique a conexão.");
-    }
-};
-
 window.renderMesaAdmin = (id, mesa) => {
     const div = document.createElement('div');
     const corBorda = mesa.status === 'ocupada' ? '#ef4444' : '#10b981';
@@ -377,7 +353,6 @@ window.renderMesaAdmin = (id, mesa) => {
     
     div.onmouseover = () => div.style.transform = 'scale(1.05)';
     div.onmouseout = () => div.style.transform = 'scale(1)';
-    
     div.onclick = () => abrirMesaAdmin(id, mesa);
     
     const grid = document.getElementById('mesa-grid-admin');
@@ -389,7 +364,17 @@ let mesaAdminAtualId = null;
 window.abrirMesaAdmin = (id, mesa) => {
     mesaAdminAtualId = id;
     document.getElementById('modal-mesa-admin').style.display = 'block';
-    document.getElementById('titulo-mesa-admin').innerText = `MESA ${mesa.numero}`;
+    
+    // botões de Editar e Excluir Mesa
+    document.getElementById('titulo-mesa-admin').innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span>MESA ${mesa.numero}</span>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="editarMesaAdmin()" style="background: #f59e0b; border: none; padding: 6px 12px; border-radius: 6px; color: white; cursor: pointer; font-size: 0.8rem; font-weight: bold;">✏️ Editar</button>
+                <button onclick="excluirMesaAdmin()" style="background: #ef4444; border: none; padding: 6px 12px; border-radius: 6px; color: white; cursor: pointer; font-size: 0.8rem; font-weight: bold;">🗑️ Excluir</button>
+            </div>
+        </div>
+    `;
 
     const consumoContainer = document.getElementById('consumo-mesa-admin');
     const areaProdutos = document.getElementById('area-produtos-mesa-admin');
@@ -415,9 +400,7 @@ window.abrirMesaAdmin = (id, mesa) => {
             </select>
             <button onclick="fecharContaMesaAdmin()" class="finalize-order-btn" style="background: #ef4444; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Encerrar Mesa e Liberar</button>
         `;
-
     } else {
-
         areaProdutos.style.display = 'none';
         areaAcoes.innerHTML = `<button onclick="ocuparMesaAdmin()" class="finalize-order-btn" style="background: #10b981; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Ocupar Mesa Agora</button>`;
     }
@@ -432,17 +415,14 @@ window.ocuparMesaAdmin = async () => {
 
 window.fecharContaMesaAdmin = async () => {
     if (!confirm("Tem certeza que deseja fechar a conta e liberar a mesa? (O valor irá para o caixa)")) return;
-    
     const mesaRef = doc(db, "mesas", mesaAdminAtualId);
     const pagamento = document.getElementById('pagamento-mesa-admin').value; 
-    
     try {
         const snap = await getDoc(mesaRef);
         const dadosMesa = snap.data();
-
         if (dadosMesa.total > 0) {
             await addDoc(collection(db, "pedidos"), {
-                cliente: `Mesa ${dadosMesa.numero}`,
+                cliente: `Fechamento: Mesa ${dadosMesa.numero}`,
                 status: "Finalizado",
                 data: serverTimestamp(),
                 total: dadosMesa.total,
@@ -451,11 +431,9 @@ window.fecharContaMesaAdmin = async () => {
                 pagamento: pagamento 
             });
         }
-
         await updateDoc(mesaRef, { status: "livre", total: 0, itens: [] });
         fecharModalMesaAdmin();
         alert("Conta fechada! O valor foi adicionado ao seu Caixa.");
-        
     } catch (e) { console.error("Erro ao fechar mesa:", e); }
 };
 
@@ -469,12 +447,54 @@ window.adicionarItemMesaAdmin = async () => {
     try {
         const snap = await getDoc(mesaRef);
         const dados = snap.data();
+        
+        //Atualiza a mesa financeira
         await updateDoc(mesaRef, {
             total: (dados.total || 0) + valor,
             itens: [...(dados.itens || []), texto]
         });
+
+        // Envia a Comanda para a Cozinha 
+        await addDoc(collection(db, "pedidos"), {
+            cliente: `MESA ${dados.numero}`,
+            status: "Pendente",
+            data: serverTimestamp(),
+            total: 0, 
+            itens: [{ name: texto, price: 0 }],
+            metodo: "Consumo na Mesa",
+            pagamento: "Comanda Cozinha"
+        });
+
         select.selectedIndex = 0;
-        alert("Item adicionado com sucesso!");
+        alert("Item adicionado e enviado para a cozinha!");
+        fecharModalMesaAdmin();
+    } catch (e) { console.error(e); }
+};
+
+// --- FUNÇÕES DE AUTONOMIA DA MESA ---
+window.adicionarNovaMesa = async () => {
+    const numeroStr = prompt("Qual é o número da nova mesa que deseja adicionar?");
+    if (!numeroStr) return; 
+    const numeroMesa = parseInt(numeroStr);
+    if (isNaN(numeroMesa) || numeroMesa <= 0) return alert("Por favor, digite um número válido.");
+    try {
+        await addDoc(collection(db, "mesas"), { numero: numeroMesa, status: "livre", total: 0, itens: [] });
+    } catch (e) { console.error("Erro ao adicionar mesa:", e); }
+};
+
+window.editarMesaAdmin = async () => {
+    const novoNumero = prompt("Digite o novo número para esta mesa:");
+    if (!novoNumero) return;
+    try {
+        await updateDoc(doc(db, "mesas", mesaAdminAtualId), { numero: parseInt(novoNumero) });
+        fecharModalMesaAdmin();
+    } catch (e) { console.error(e); }
+};
+
+window.excluirMesaAdmin = async () => {
+    if (!confirm("⚠️ ATENÇÃO: Tem a certeza que deseja excluir esta mesa do sistema? Esta ação não pode ser desfeita.")) return;
+    try {
+        await deleteDoc(doc(db, "mesas", mesaAdminAtualId));
         fecharModalMesaAdmin();
     } catch (e) { console.error(e); }
 };
