@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDoc} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDs17Az4-kB--3LdBs1KwPNDrEr37jYkCU",
@@ -22,14 +22,11 @@ const mesaGridAdmin = document.getElementById('mesa-grid-admin');
 
 // --- 2. LÓGICA DE NAVEGAÇÃO (COLOQUE AQUI) ---
 window.switchView = (viewId, el) => {
-    // Remove o estado ativo de todas as seções e links
     document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
     
-    // Ativa a seção correspondente
     document.getElementById(viewId).classList.add('active');
     
-    // Se o elemento foi passado (pelo clique), marca como ativo no menu
     if (el) el.classList.add('active');
 };
 
@@ -39,7 +36,7 @@ if (configUrl) {
     configUrl.innerText = window.location.origin + "/garcom.html";
 }
 
-// --- 3. GESTÃO FINANCEIRA E REAL-TIME ---
+// GESTÃO FINANCEIRA E REAL-TIME ---
 let faturamentoFinalizado = 0;
 let faturamentoMesasAberto = 0;
 
@@ -204,7 +201,7 @@ window.adicionarItemBalcao = () => {
     totalBalcao += valor;
     
     atualizarCarrinhoBalcao();
-    select.selectedIndex = 0; // Reseta o select
+    select.selectedIndex = 0; 
 };
 
 function atualizarCarrinhoBalcao() {
@@ -333,37 +330,92 @@ window.adicionarInsumo = async () => {
     }
 };
 
-// --- FUNÇÃO PARA AS MESAS NO PAINEL ADMIN ---
+// GESTÃO DE MESAS (SUPER ADMIN) ---
+
 window.renderMesaAdmin = (id, mesa) => {
     const div = document.createElement('div');
-    
     const corBorda = mesa.status === 'ocupada' ? '#ef4444' : '#10b981';
     const corFundo = mesa.status === 'ocupada' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
     
     div.style.cssText = `
-        background: ${corFundo};
-        border: 2px solid ${corBorda};
-        border-radius: 12px; 
-        height: 120px; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: center; 
-        color: #f8fafc;
-        cursor: pointer;
-        transition: transform 0.2s;
+        background: ${corFundo}; border: 2px solid ${corBorda}; border-radius: 12px; 
+        height: 120px; display: flex; flex-direction: column; align-items: center; 
+        justify-content: center; color: #f8fafc; cursor: pointer; transition: transform 0.2s;
     `;
-    
     div.innerHTML = `
         <span style="font-size: 1.5rem; font-weight: bold;">MESA ${mesa.numero}</span>
         <span style="font-size: 0.8rem; text-transform: uppercase; color: ${corBorda};">${mesa.status}</span>
         ${mesa.status === 'ocupada' ? `<span style="color: #f59e0b; margin-top: 5px; font-weight: bold;">R$ ${(mesa.total || 0).toFixed(2).replace('.', ',')}</span>` : ''}
     `;
     
-    // Efeito de clique simples
     div.onmouseover = () => div.style.transform = 'scale(1.05)';
     div.onmouseout = () => div.style.transform = 'scale(1)';
     
+    div.onclick = () => abrirMesaAdmin(id, mesa);
+    
     const grid = document.getElementById('mesa-grid-admin');
     if (grid) grid.appendChild(div);
+};
+
+let mesaAdminAtualId = null;
+
+window.abrirMesaAdmin = (id, mesa) => {
+    mesaAdminAtualId = id;
+    document.getElementById('modal-mesa-admin').style.display = 'block';
+    document.getElementById('titulo-mesa-admin').innerText = `MESA ${mesa.numero}`;
+
+    const consumoContainer = document.getElementById('consumo-mesa-admin');
+    const areaProdutos = document.getElementById('area-produtos-mesa-admin');
+    const areaAcoes = document.getElementById('area-acoes-mesa-admin');
+
+    let htmlConsumo = `<p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">ITENS NA MESA:</p><div style="font-size: 0.95rem; margin-bottom: 15px;">`;
+    if (mesa.itens && mesa.itens.length > 0) {
+        mesa.itens.forEach(item => htmlConsumo += `<div style="margin-bottom: 5px; color: #f8fafc;">• ${item}</div>`);
+    } else {
+        htmlConsumo += `<div style="color: #64748b;">Nenhum item lançado</div>`;
+    }
+    htmlConsumo += `</div><div style="border-top: 1px solid #334155; padding-top: 10px; text-align: right; font-size: 1.2rem;">Total: <b style="color: #f59e0b;">R$ ${(mesa.total || 0).toFixed(2).replace('.', ',')}</b></div>`;
+    consumoContainer.innerHTML = htmlConsumo;
+
+    // Define quais botões o Admin pode ver dependendo do status da mesa
+    if (mesa.status === 'ocupada') {
+        areaProdutos.style.display = 'block';
+        areaAcoes.innerHTML = `<button onclick="fecharContaMesaAdmin()" class="finalize-order-btn" style="background: #ef4444; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Encerrar Mesa e Liberar</button>`;
+    } else {
+        areaProdutos.style.display = 'none';
+        areaAcoes.innerHTML = `<button onclick="ocuparMesaAdmin()" class="finalize-order-btn" style="background: #10b981; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Ocupar Mesa Agora</button>`;
+    }
+};
+
+window.fecharModalMesaAdmin = () => document.getElementById('modal-mesa-admin').style.display = 'none';
+
+window.ocuparMesaAdmin = async () => {
+    try { await updateDoc(doc(db, "mesas", mesaAdminAtualId), { status: "ocupada" }); fecharModalMesaAdmin(); } 
+    catch (e) { console.error(e); }
+};
+
+window.fecharContaMesaAdmin = async () => {
+    if (!confirm("Tem certeza que deseja fechar a conta e liberar a mesa?")) return;
+    try { await updateDoc(doc(db, "mesas", mesaAdminAtualId), { status: "livre", total: 0, itens: [] }); fecharModalMesaAdmin(); } 
+    catch (e) { console.error(e); }
+};
+
+window.adicionarItemMesaAdmin = async () => {
+    const select = document.getElementById('select-produto-mesa-admin');
+    const valor = parseFloat(select.value);
+    const texto = select.options[select.selectedIndex].text;
+    if (!valor) return alert("Selecione um produto!");
+
+    const mesaRef = doc(db, "mesas", mesaAdminAtualId);
+    try {
+        const snap = await getDoc(mesaRef);
+        const dados = snap.data();
+        await updateDoc(mesaRef, {
+            total: (dados.total || 0) + valor,
+            itens: [...(dados.itens || []), texto]
+        });
+        select.selectedIndex = 0;
+        alert("Item adicionado com sucesso!");
+        fecharModalMesaAdmin();
+    } catch (e) { console.error(e); }
 };
