@@ -13,14 +13,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- 1. SELEÇÃO DE ELEMENTOS DO DOM ---
 const colPendente = document.getElementById('col-pendente');
 const colPreparando = document.getElementById('col-preparando');
 const colFinalizado = document.getElementById('col-finalizado');
 const statsDiv = document.getElementById('stats');
 const mesaGridAdmin = document.getElementById('mesa-grid-admin');
 
-// --- 2. LÓGICA DE NAVEGAÇÃO (COLOQUE AQUI) ---
+// LÓGICA DE NAVEGAÇÃO 
 window.switchView = (viewId, el) => {
     document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -30,7 +29,6 @@ window.switchView = (viewId, el) => {
     if (el) el.classList.add('active');
 };
 
-// Configura a URL para os garçons conectarem
 const configUrl = document.getElementById('url-garcom');
 if (configUrl) {
     configUrl.innerText = window.location.origin + "/garcom.html";
@@ -47,6 +45,7 @@ let totalCredito = 0;
 let totalDebito = 0;
 let totalPedidosDia = 0;
 
+// Escutar pedidos de Delivery/Retirada e Salão Fechado
 // Escutar pedidos de Delivery/Retirada e Salão Fechado
 onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snapshot) => {
     colPendente.innerHTML = "";
@@ -67,11 +66,18 @@ onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snapshot)
             faturamentoFinalizado += (pedido.total || 0);
             totalPedidosDia++;
             
-            const pag = pedido.pagamento ? pedido.pagamento.toLowerCase() : "";
-            if (pag.includes("dinheiro")) totalDinheiro += pedido.total;
-            else if (pag.includes("pix")) totalPix += pedido.total;
-            else if (pag.includes("crédito") || pag.includes("credito")) totalCredito += pedido.total;
-            else if (pag.includes("débito") || pag.includes("debito")) totalDebito += pedido.total;
+            if (pedido.pagamento === "Misto" && pedido.split) {
+                totalDinheiro += (pedido.split.dinheiro || 0);
+                totalPix += (pedido.split.pix || 0);
+                totalCredito += (pedido.split.credito || 0);
+                totalDebito += (pedido.split.debito || 0);
+            } else {
+                const pag = pedido.pagamento ? pedido.pagamento.toLowerCase() : "";
+                if (pag.includes("dinheiro")) totalDinheiro += pedido.total;
+                else if (pag.includes("pix")) totalPix += pedido.total;
+                else if (pag.includes("crédito") || pag.includes("credito")) totalCredito += pedido.total;
+                else if (pag.includes("débito") || pag.includes("debito")) totalDebito += pedido.total;
+            }
         }
         
         renderCard(docSnap.id, pedido);
@@ -201,8 +207,37 @@ onSnapshot(collection(db, "estoque"), (snapshot) => {
     });
 });
 
-// --- (PDV) ---
+// --- FUNÇÕES DE PAGAMENTO MISTO ---
+window.toggleMisto = (tipo) => {
+    const select = document.getElementById(`pagamento-${tipo}`);
+    const divMisto = document.getElementById(`misto-${tipo}`);
+    if(select && divMisto) {
+        divMisto.style.display = select.value === 'Misto' ? 'block' : 'none';
+    }
+};
 
+window.obterDadosPagamento = (tipo, totalEsperado) => {
+    const pagamento = document.getElementById(`pagamento-${tipo}`).value;
+    let split = null;
+
+    if (pagamento === 'Misto') {
+        const din = parseFloat(document.getElementById(`misto-dinheiro-${tipo}`).value) || 0;
+        const pix = parseFloat(document.getElementById(`misto-pix-${tipo}`).value) || 0;
+        const cred = parseFloat(document.getElementById(`misto-credito-${tipo}`).value) || 0;
+        const deb = parseFloat(document.getElementById(`misto-debito-${tipo}`).value) || 0;
+        const soma = din + pix + cred + deb;
+
+        // Proteção contra matemática errada do operador
+        if (Math.abs(soma - totalEsperado) > 0.05) {
+            alert(`ERRO: A soma do pagamento misto (R$ ${soma.toFixed(2)}) não bate com o Total do Pedido (R$ ${totalEsperado.toFixed(2)}). Corrija os valores.`);
+            return { erro: true };
+        }
+        split = { dinheiro: din, pix: pix, credito: cred, debito: deb };
+    }
+    return { pagamento, split, erro: false };
+};
+
+// --- (PDV) ---
 // LÓGICA DE FRENTE DE CAIXA (PDV BALCÃO) E ESTOQUE AUTOMÁTICO ---
 
 let carrinhoBalcao = [];
@@ -253,39 +288,132 @@ window.removerItemBalcao = (index) => {
 
 window.finalizarPedidoBalcao = async () => {
     const cliente = document.getElementById('input-cliente-balcao').value;
-    const pagamento = document.getElementById('pagamento-balcao').value;
-    
-    
     if (!cliente) return alert("Preencha o nome do cliente!");
     if (carrinhoBalcao.length === 0) return alert("A comanda está vazia!");
 
-    try {
-        // Salva o pedido no banco de dados (Aparece na coluna de Pendentes)
-        await addDoc(collection(db, "pedidos"), {
-            cliente: cliente,
-            status: "Pendente",
-            data: serverTimestamp(),
-            total: totalBalcao,
-            itens: carrinhoBalcao,
-            metodo: "Balcão",
-            pagamento: pagamento
-        });
+    const dadosPagamento = obterDadosPagamento('balcao', totalBalcao);
+    if (dadosPagamento.erro) return;
 
-        const qtdLanches = carrinhoBalcao.filter(i => i.name.includes("X-")).length;
+    try {
+        await addDoc(collection(db, "pedidos"), {
+            cliente: cliente, status: "Preparando", data: serverTimestamp(),
+            total: totalBalcao, itens: carrinhoBalcao, metodo: "Balcão", 
+            pagamento: dadosPagamento.pagamento,
+            split: dadosPagamento.split 
+        });
         
-        if (qtdLanches > 0) {
-            console.log(`Abatendo ${qtdLanches} pães do estoque...`);
-            alert(`Pedido finalizado! O sistema reconheceu ${qtdLanches} lanches e descontaria do estoque.`);
-        } else {
-            alert("Pedido lançado com sucesso!");
-        }
+        imprimirContaCliente(cliente, carrinhoBalcao, totalBalcao, dadosPagamento.pagamento);
+        setTimeout(() => imprimirComandaCozinha(cliente, carrinhoBalcao), 1500);
 
         fecharModalBalcao();
         document.getElementById('input-cliente-balcao').value = "";
-    } catch (e) {
-        console.error("Erro ao finalizar:", e);
-        alert("Erro ao lançar pedido.");
+        
+        document.getElementById('misto-dinheiro-balcao').value = "";
+        document.getElementById('misto-pix-balcao').value = "";
+        document.getElementById('misto-credito-balcao').value = "";
+        document.getElementById('misto-debito-balcao').value = "";
+        document.getElementById('pagamento-balcao').value = "Dinheiro";
+        toggleMisto('balcao');
+
+    } catch (e) { console.error(e); }
+};
+
+window.abrirMesaAdmin = (id, mesa) => {
+    mesaAdminAtualId = id;
+    mesaSubtotalAtual = mesa.total || 0; 
+    document.getElementById('modal-mesa-admin').style.display = 'block';
+    
+    document.getElementById('titulo-mesa-admin').innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <span>MESA ${mesa.numero}</span>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="editarMesaAdmin()" style="background: #f59e0b; border: none; padding: 6px 12px; border-radius: 6px; color: white; cursor: pointer; font-size: 0.8rem; font-weight: bold;">✏️ Editar</button>
+                <button onclick="excluirMesaAdmin()" style="background: #ef4444; border: none; padding: 6px 12px; border-radius: 6px; color: white; cursor: pointer; font-size: 0.8rem; font-weight: bold;">🗑️ Excluir</button>
+            </div>
+        </div>
+    `;
+
+    const consumoContainer = document.getElementById('consumo-mesa-admin');
+    const calculoFinanceiro = document.getElementById('calculo-financeiro-mesa');
+    const areaProdutos = document.getElementById('area-produtos-mesa-admin');
+    const areaAcoes = document.getElementById('area-acoes-mesa-admin');
+
+    document.getElementById('mesa-input-desconto').value = "0";
+    document.getElementById('mesa-input-pessoas').value = "1";
+
+    let htmlConsumo = `<p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">ITENS NA MESA:</p><div style="font-size: 0.95rem;">`;
+    if (mesa.itens && mesa.itens.length > 0) {
+        mesa.itens.forEach(item => htmlConsumo += `<div style="margin-bottom: 5px; color: #f8fafc;">• ${item}</div>`);
+    } else {
+        htmlConsumo += `<div style="color: #64748b;">Nenhum item lançado</div>`;
     }
+    htmlConsumo += `</div>`;
+    consumoContainer.innerHTML = htmlConsumo;
+
+    if (mesa.status === 'ocupada') {
+        calculoFinanceiro.style.display = 'block';
+        areaProdutos.style.display = 'block';
+        calcularTotaisMesa(); 
+        
+        areaAcoes.innerHTML = `
+            <select id="pagamento-mesa-admin" onchange="toggleMisto('mesa-admin')" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; margin-bottom: 10px;">
+                <option value="Dinheiro">💵 Dinheiro</option>
+                <option value="Pix">💠 Pix</option>
+                <option value="Cartão de Crédito">💳 Cartão de Crédito</option>
+                <option value="Cartão de Débito">💳 Cartão de Débito</option>
+                <option value="Misto">🔀 Pagamento Misto</option>
+            </select>
+            
+            <div id="misto-mesa-admin" style="display: none; background: #0f172a; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155;">
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px;">Dividir Valores (R$):</p>
+                <div style="display: flex; gap: 5px; margin-bottom: 5px;">
+                    <input type="number" id="misto-dinheiro-mesa-admin" placeholder="Dinheiro" style="flex: 1; padding: 8px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 4px;">
+                    <input type="number" id="misto-pix-mesa-admin" placeholder="Pix" style="flex: 1; padding: 8px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 4px;">
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <input type="number" id="misto-credito-mesa-admin" placeholder="Crédito" style="flex: 1; padding: 8px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 4px;">
+                    <input type="number" id="misto-debito-mesa-admin" placeholder="Débito" style="flex: 1; padding: 8px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 4px;">
+                </div>
+            </div>
+
+            <button onclick="fecharContaMesaAdmin()" class="finalize-order-btn" style="background: #ef4444; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Encerrar Mesa e Imprimir Conta</button>
+        `;
+    } else {
+        calculoFinanceiro.style.display = 'none';
+        areaProdutos.style.display = 'none';
+        areaAcoes.innerHTML = `<button onclick="ocuparMesaAdmin()" class="finalize-order-btn" style="background: #10b981; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Ocupar Mesa Agora</button>`;
+    }
+};
+
+window.fecharContaMesaAdmin = async () => {
+    if (!confirm("Tem certeza que deseja fechar a conta e liberar a mesa?")) return;
+    
+    const dadosPagamento = obterDadosPagamento('mesa-admin', mesaTotalFinalAtual);
+    if (dadosPagamento.erro) return;
+
+    const mesaRef = doc(db, "mesas", mesaAdminAtualId);
+    try {
+        const snap = await getDoc(mesaRef);
+        const dadosMesa = snap.data();
+        
+        if (mesaTotalFinalAtual > 0) {
+            await addDoc(collection(db, "pedidos"), {
+                cliente: `Fechamento: Mesa ${dadosMesa.numero}`,
+                status: "Finalizado",
+                data: serverTimestamp(),
+                total: mesaTotalFinalAtual,
+                itens: dadosMesa.itens ? dadosMesa.itens.map(nome => ({ name: nome, price: 0 })) : [],
+                metodo: "Salão (Mesa)",
+                pagamento: dadosPagamento.pagamento,
+                split: dadosPagamento.split 
+            });
+            
+            imprimirContaCliente(`Mesa ${dadosMesa.numero}`, dadosMesa.itens ? dadosMesa.itens.map(nome => ({ name: nome })) : [], mesaTotalFinalAtual, dadosPagamento.pagamento);
+        }
+        
+        await updateDoc(mesaRef, { status: "livre", total: 0, itens: [] });
+        fecharModalMesaAdmin();
+    } catch (e) { console.error("Erro ao fechar mesa:", e); }
 };
 
 //  PARA CRIAR O CARD DO PEDIDO
@@ -399,83 +527,26 @@ window.renderMesaAdmin = (id, mesa) => {
     if (grid) grid.appendChild(div);
 };
 
+
+// --- LÓGICA DE GESTÃO DE MESAS ---
+
 let mesaAdminAtualId = null;
+let mesaSubtotalAtual = 0;
+let mesaTotalFinalAtual = 0;
 
-window.abrirMesaAdmin = (id, mesa) => {
-    mesaAdminAtualId = id;
-    document.getElementById('modal-mesa-admin').style.display = 'block';
-    
-    // botões de Editar e Excluir Mesa
-    document.getElementById('titulo-mesa-admin').innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <span>MESA ${mesa.numero}</span>
-            <div style="display: flex; gap: 8px;">
-                <button onclick="editarMesaAdmin()" style="background: #f59e0b; border: none; padding: 6px 12px; border-radius: 6px; color: white; cursor: pointer; font-size: 0.8rem; font-weight: bold;">✏️ Editar</button>
-                <button onclick="excluirMesaAdmin()" style="background: #ef4444; border: none; padding: 6px 12px; border-radius: 6px; color: white; cursor: pointer; font-size: 0.8rem; font-weight: bold;">🗑️ Excluir</button>
-            </div>
-        </div>
-    `;
+window.calcularTotaisMesa = () => {
+    const subtotal = mesaSubtotalAtual || 0;
+    const desconto = parseFloat(document.getElementById('mesa-input-desconto').value) || 0;
+    const pessoas = parseInt(document.getElementById('mesa-input-pessoas').value) || 1;
 
-    const consumoContainer = document.getElementById('consumo-mesa-admin');
-    const areaProdutos = document.getElementById('area-produtos-mesa-admin');
-    const areaAcoes = document.getElementById('area-acoes-mesa-admin');
+    mesaTotalFinalAtual = Math.max(0, subtotal - desconto); 
+    const valorPorPessoa = mesaTotalFinalAtual / pessoas;
 
-    let htmlConsumo = `<p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">ITENS NA MESA:</p><div style="font-size: 0.95rem; margin-bottom: 15px;">`;
-    if (mesa.itens && mesa.itens.length > 0) {
-        mesa.itens.forEach(item => htmlConsumo += `<div style="margin-bottom: 5px; color: #f8fafc;">• ${item}</div>`);
-    } else {
-        htmlConsumo += `<div style="color: #64748b;">Nenhum item lançado</div>`;
-    }
-    htmlConsumo += `</div><div style="border-top: 1px solid #334155; padding-top: 10px; text-align: right; font-size: 1.2rem;">Total: <b style="color: #f59e0b;">R$ ${(mesa.total || 0).toFixed(2).replace('.', ',')}</b></div>`;
-    consumoContainer.innerHTML = htmlConsumo;
-
-    if (mesa.status === 'ocupada') {
-        areaProdutos.style.display = 'block';
-        areaAcoes.innerHTML = `
-            <select id="pagamento-mesa-admin" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; margin-bottom: 10px;">
-                <option value="Dinheiro">💵 Dinheiro</option>
-                <option value="Pix">💠 Pix</option>
-                <option value="Cartão de Crédito">💳 Cartão de Crédito</option>
-                <option value="Cartão de Débito">💳 Cartão de Débito</option>
-            </select>
-            <button onclick="fecharContaMesaAdmin()" class="finalize-order-btn" style="background: #ef4444; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Encerrar Mesa e Liberar</button>
-        `;
-    } else {
-        areaProdutos.style.display = 'none';
-        areaAcoes.innerHTML = `<button onclick="ocuparMesaAdmin()" class="finalize-order-btn" style="background: #10b981; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">Ocupar Mesa Agora</button>`;
-    }
+    document.getElementById('mesa-subtotal').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+    document.getElementById('mesa-total-final').innerText = `R$ ${mesaTotalFinalAtual.toFixed(2).replace('.', ',')}`;
+    document.getElementById('mesa-valor-pessoa').innerText = `R$ ${valorPorPessoa.toFixed(2).replace('.', ',')}`;
 };
 
-window.fecharModalMesaAdmin = () => document.getElementById('modal-mesa-admin').style.display = 'none';
-
-window.ocuparMesaAdmin = async () => {
-    try { await updateDoc(doc(db, "mesas", mesaAdminAtualId), { status: "ocupada" }); fecharModalMesaAdmin(); } 
-    catch (e) { console.error(e); }
-};
-
-window.fecharContaMesaAdmin = async () => {
-    if (!confirm("Tem certeza que deseja fechar a conta e liberar a mesa? (O valor irá para o caixa)")) return;
-    const mesaRef = doc(db, "mesas", mesaAdminAtualId);
-    const pagamento = document.getElementById('pagamento-mesa-admin').value; 
-    try {
-        const snap = await getDoc(mesaRef);
-        const dadosMesa = snap.data();
-        if (dadosMesa.total > 0) {
-            await addDoc(collection(db, "pedidos"), {
-                cliente: `Fechamento: Mesa ${dadosMesa.numero}`,
-                status: "Finalizado",
-                data: serverTimestamp(),
-                total: dadosMesa.total,
-                itens: dadosMesa.itens ? dadosMesa.itens.map(nome => ({ name: nome, price: 0 })) : [],
-                metodo: "Salão (Mesa)",
-                pagamento: pagamento 
-            });
-        }
-        await updateDoc(mesaRef, { status: "livre", total: 0, itens: [] });
-        fecharModalMesaAdmin();
-        alert("Conta fechada! O valor foi adicionado ao seu Caixa.");
-    } catch (e) { console.error("Erro ao fechar mesa:", e); }
-};
 
 window.adicionarItemMesaAdmin = async () => {
     const select = document.getElementById('select-produto-mesa-admin');
@@ -540,52 +611,92 @@ window.excluirMesaAdmin = async () => {
 };
 
 
-// --- MÓDULO DE ABERTURA E FECHO DE CAIXA ---
+// ---MÓDULO DE ABERTURA, MOVIMENTAÇÃO E FECHO DE CAIXA ---
 
 let valorAberturaCaixa = parseFloat(localStorage.getItem('esquina_valorAbertura')) || 0;
+let totalSangriaCaixa = parseFloat(localStorage.getItem('esquina_totalSangria')) || 0;
+let totalSuprimentoCaixa = parseFloat(localStorage.getItem('esquina_totalSuprimento')) || 0;
 let caixaAberto = localStorage.getItem('esquina_caixaAberto') === 'true';
 
 function atualizarBotoesCaixa() {
     if (caixaAberto) {
         document.getElementById('btn-abrir-caixa').style.display = 'none';
         document.getElementById('btn-fechar-caixa').style.display = 'block';
+        document.getElementById('btn-suprimento').style.display = 'block';
+        document.getElementById('btn-sangria').style.display = 'block';
     } else {
         document.getElementById('btn-abrir-caixa').style.display = 'block';
         document.getElementById('btn-fechar-caixa').style.display = 'none';
+        document.getElementById('btn-suprimento').style.display = 'none';
+        document.getElementById('btn-sangria').style.display = 'none';
     }
 }
-
 setTimeout(atualizarBotoesCaixa, 500);
 
 window.abrirCaixaManha = () => {
     const valorStr = prompt("Qual o valor do Fundo de Troco que está na gaveta agora? (Ex: 50.00)");
-    if (valorStr === null) return; // Cancelou
+    if (valorStr === null) return; 
     
     const valor = parseFloat(valorStr.replace(',', '.'));
     if (isNaN(valor) || valor < 0) return alert("Por favor, digite um valor válido.");
 
-    
     valorAberturaCaixa = valor;
+    totalSangriaCaixa = 0;
+    totalSuprimentoCaixa = 0;
     caixaAberto = true;
+    
     localStorage.setItem('esquina_valorAbertura', valorAberturaCaixa);
+    localStorage.setItem('esquina_totalSangria', '0');
+    localStorage.setItem('esquina_totalSuprimento', '0');
     localStorage.setItem('esquina_caixaAberto', 'true');
     
     atualizarBotoesCaixa();
     alert(`Caixa aberto com sucesso! Fundo de troco: R$ ${valor.toFixed(2).replace('.', ',')}`);
 };
 
+// Função: Sangria (Retirar Dinheiro)
+window.registrarSangria = () => {
+    const valorStr = prompt("Quanto dinheiro está a RETIRAR da gaveta? (Ex: 20.00)");
+    if (valorStr === null) return;
+    const valor = parseFloat(valorStr.replace(',', '.'));
+    if (isNaN(valor) || valor <= 0) return alert("Valor inválido.");
+    
+    const motivo = prompt("Qual o motivo da Sangria? (Ex: Pagamento Motoboy, Troco, etc)");
+    
+    totalSangriaCaixa += valor;
+    localStorage.setItem('esquina_totalSangria', totalSangriaCaixa);
+    alert(`Sangria de R$ ${valor.toFixed(2)} registada com sucesso! (${motivo})`);
+};
+
+// Função: Suprimento (Adicionar Dinheiro)
+window.registrarSuprimento = () => {
+    const valorStr = prompt("Quanto dinheiro extra está a COLOCAR na gaveta? (Ex: 100.00)");
+    if (valorStr === null) return;
+    const valor = parseFloat(valorStr.replace(',', '.'));
+    if (isNaN(valor) || valor <= 0) return alert("Valor inválido.");
+    
+    const motivo = prompt("Qual o motivo do Suprimento? (Ex: Troco do banco)");
+    
+    totalSuprimentoCaixa += valor;
+    localStorage.setItem('esquina_totalSuprimento', totalSuprimentoCaixa);
+    alert(`Suprimento de R$ ${valor.toFixed(2)} registado com sucesso! (${motivo})`);
+};
+
 window.abrirModalFechoCaixa = () => {
     document.getElementById('fecho-troco').innerText = valorAberturaCaixa.toFixed(2).replace('.', ',');
     document.getElementById('fecho-dinheiro').innerText = totalDinheiro.toFixed(2).replace('.', ',');
+    document.getElementById('fecho-suprimento').innerText = totalSuprimentoCaixa.toFixed(2).replace('.', ',');
+    document.getElementById('fecho-sangria').innerText = totalSangriaCaixa.toFixed(2).replace('.', ',');
     
-    const esperadoGaveta = valorAberturaCaixa + totalDinheiro;
+    // Matemática exata da Gaveta
+    const esperadoGaveta = valorAberturaCaixa + totalDinheiro + totalSuprimentoCaixa - totalSangriaCaixa;
     document.getElementById('fecho-esperado-gaveta').innerText = esperadoGaveta.toFixed(2).replace('.', ',');
 
     document.getElementById('fecho-pix').innerText = totalPix.toFixed(2).replace('.', ',');
-    
     const cartoes = totalCredito + totalDebito;
     document.getElementById('fecho-cartoes').innerText = cartoes.toFixed(2).replace('.', ',');
     
+    // Faturamento é só o que vendeu, não conta com os trocos adicionados
     const totalFaturado = totalDinheiro + totalPix + cartoes;
     document.getElementById('fecho-total').innerText = totalFaturado.toFixed(2).replace('.', ',');
     
@@ -601,11 +712,15 @@ window.confirmarFechoCaixa = async () => {
     
     try {
         const totalVendas = totalDinheiro + totalPix + totalCredito + totalDebito;
+        const esperadoGaveta = valorAberturaCaixa + totalDinheiro + totalSuprimentoCaixa - totalSangriaCaixa;
         
         await addDoc(collection(db, "caixa"), {
             data: serverTimestamp(),
             valorAbertura: valorAberturaCaixa,
-            valorFechamento: totalVendas,
+            sangrias: totalSangriaCaixa,
+            suprimentos: totalSuprimentoCaixa,
+            esperadoEmGaveta: esperadoGaveta,
+            valorFechamentoVendas: totalVendas,
             vendasPorTipo: {
                 dinheiro: totalDinheiro,
                 pix: totalPix,
@@ -616,8 +731,12 @@ window.confirmarFechoCaixa = async () => {
         
         caixaAberto = false;
         valorAberturaCaixa = 0;
+        totalSangriaCaixa = 0;
+        totalSuprimentoCaixa = 0;
         localStorage.removeItem('esquina_caixaAberto');
         localStorage.removeItem('esquina_valorAbertura');
+        localStorage.removeItem('esquina_totalSangria');
+        localStorage.removeItem('esquina_totalSuprimento');
         
         atualizarBotoesCaixa();
         fecharModalFechoCaixa();

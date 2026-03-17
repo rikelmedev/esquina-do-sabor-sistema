@@ -80,6 +80,10 @@
                 <div><h1 style="margin: 0;">Visão Geral</h1><p id="data-hoje" style="color: #94a3b8; font-size: 0.9rem; margin: 5px 0 0 0;"></p></div>
                 <div style="display: flex; gap: 10px;">
                     <button id="btn-abrir-caixa" onclick="abrirCaixaManha()" style="padding: 12px 20px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🔓 Abrir Caixa</button>
+                    
+                    <button id="btn-suprimento" onclick="registrarSuprimento()" style="display: none; padding: 12px 15px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🔺 Suprimento</button>
+                    <button id="btn-sangria" onclick="registrarSangria()" style="display: none; padding: 12px 15px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🔻 Sangria</button>
+                    
                     <button id="btn-fechar-caixa" onclick="abrirModalFechoCaixa()" style="display: none; padding: 12px 20px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🔒 Fechar Caixa</button>
                 </div>
             </div>
@@ -149,23 +153,62 @@
                 <div style="border-top: 1px solid #334155; padding-top: 10px; text-align: right; font-size: 1.2rem; color: #f8fafc;">Total: <b style="color: #10b981;">R$ <span id="total-balcao">0.00</span></b></div>
             </div>
 
-            <select id="pagamento-balcao" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; margin-bottom: 15px;">
+           <select id="pagamento-balcao" onchange="toggleMisto('balcao')" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; margin-bottom: 15px;">
                 <option value="Dinheiro">💵 Dinheiro</option>
                 <option value="Pix">💠 Pix</option>
                 <option value="Cartão de Crédito">💳 Cartão de Crédito</option>
                 <option value="Cartão de Débito">💳 Cartão de Débito</option>
+                <option value="Misto">🔀 Pagamento Misto</option>
             </select>
 
-            <button onclick="finalizarPedidoBalcao()" style="background: #10b981; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">✅ Confirmar e Enviar para Cozinha</button>
-        </div>
+            <div id="misto-balcao" style="display: none; background: #1e293b; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #334155;">
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px;">Dividir Valores (R$):</p>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="number" id="misto-dinheiro-balcao" placeholder="Dinheiro" style="flex: 1; padding: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 4px;">
+                    <input type="number" id="misto-pix-balcao" placeholder="Pix" style="flex: 1; padding: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 4px;">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="misto-credito-balcao" placeholder="Crédito" style="flex: 1; padding: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 4px;">
+                    <input type="number" id="misto-debito-balcao" placeholder="Débito" style="flex: 1; padding: 10px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 4px;">
+                </div>
+            </div>
+            
+            <button onclick="finalizarPedidoBalcao()" style="background: #10b981; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer;">✅ Confirmar e Enviar para Cozinha</button> </div>
     </div>
 
     <div id="modal-mesa-admin" class="modal">
+        <div id="modal-mesa-admin" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="fecharModalMesaAdmin()">&times;</span>
             <h2 id="titulo-mesa-admin" style="color: #f8fafc; font-size: 1.5rem !important; margin-bottom: 20px;">Gestão de Mesa</h2>
             
-            <div id="consumo-mesa-admin" style="background: #0f172a; padding: 15px; border-radius: 8px; margin-bottom: 20px; min-height: 100px;"></div>
+            <div id="consumo-mesa-admin" style="background: #0f172a; padding: 15px; border-radius: 8px; margin-bottom: 10px; min-height: 80px;">
+                </div>
+
+            <div id="calculo-financeiro-mesa" style="background: #1e293b; border: 1px solid #334155; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: #94a3b8;">
+                    <span>Subtotal:</span>
+                    <span id="mesa-subtotal">R$ 0,00</span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;">
+                    <label style="color: #f8fafc;">Desconto (R$):</label>
+                    <input type="number" id="mesa-input-desconto" value="0" min="0" step="0.50" oninput="calcularTotaisMesa()" style="width: 80px; padding: 6px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 5px; text-align: right;">
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-top: 10px; border-top: 1px solid #334155; font-size: 1.3rem; font-weight: bold;">
+                    <span style="color: #f8fafc;">TOTAL FINAL:</span>
+                    <span id="mesa-total-final" style="color: #10b981;">R$ 0,00</span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #334155;">
+                    <label style="color: #94a3b8;">Dividir por (pessoas):</label>
+                    <input type="number" id="mesa-input-pessoas" value="1" min="1" oninput="calcularTotaisMesa()" style="width: 60px; padding: 6px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 5px; text-align: center; font-weight: bold;">
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 1.1rem;">
+                    <span style="color: #94a3b8;">Valor por pessoa:</span>
+                    <span id="mesa-valor-pessoa" style="color: #f59e0b; font-weight: bold;">R$ 0,00</span>
+                </div>
+            </div>
 
             <div id="area-produtos-mesa-admin" style="margin-top: 15px; display: none;">
                 <label style="color: #3b82f6; font-size: 0.9rem; font-weight: bold;">Lançar Novo Item:</label>
@@ -181,6 +224,7 @@
             <div id="area-acoes-mesa-admin" style="margin-top: 20px;"></div>
         </div>
     </div>
+    </div>
 
     <div id="modal-fecho-caixa" class="modal">
         <div class="modal-content">
@@ -188,15 +232,23 @@
             <h2 style="color: #f8fafc; font-size: 1.5rem !important; margin-bottom: 20px;">🔒 Fecho de Caixa</h2>
             
             <div style="background: #0f172a; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h3 style="color: #94a3b8; font-size: 1rem; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px;">Conferência da Gaveta</h3>
+                <h3 style="color: #94a3b8; font-size: 1rem; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px;">Conferência da Gaveta (Dinheiro)</h3>
                 
                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
-                    <span style="color: #94a3b8;">🪙 Fundo de Troco (Abertura):</span>
+                    <span style="color: #94a3b8;"> Fundo de Troco (Abertura):</span>
                     <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-troco">0,00</span></span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
                     <span style="color: #10b981;">💵 Vendas em Dinheiro:</span>
-                    <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-dinheiro">0,00</span></span>
+                    <span style="font-weight: bold; color: #f8fafc;">+ R$ <span id="fecho-dinheiro">0,00</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
+                    <span style="color: #3b82f6;">🔺 Suprimentos (Entradas):</span>
+                    <span style="font-weight: bold; color: #f8fafc;">+ R$ <span id="fecho-suprimento">0,00</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
+                    <span style="color: #ef4444;">🔻 Sangrias (Saídas):</span>
+                    <span style="font-weight: bold; color: #f8fafc;">- R$ <span id="fecho-sangria">0,00</span></span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #334155; font-size: 1.1rem;">
                     <span style="color: #f59e0b; font-weight: bold;">💰 Esperado na Gaveta:</span>
