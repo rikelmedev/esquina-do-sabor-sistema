@@ -2,58 +2,127 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App do Garçom - Esquina do Sabor</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Comanda Mobile - Esquina do Sabor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; padding: 20px; }
-        .mesa-card { background: #2a2a2a; border-radius: 12px; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #444; transition: transform 0.2s; }
-        .mesa-card.livre { border-color: #2ecc71; }
-        .mesa-card.ocupada { border-color: var(--color-red-fire); background: #3d1010; }
-        .mesa-numero { font-size: 2.5rem; font-family: 'Teko', sans-serif; }
-        .mesa-status { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        /* RESET E BASE */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
+        
+        /* CABEÇALHO */
+        header { background: #1e293b; padding: 20px; text-align: center; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        h1 { font-size: 1.5rem; color: #3b82f6; font-weight: 800; letter-spacing: -0.5px; }
+        .subtitle { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+        /* GRID DE MESAS */
+        .container { padding: 20px; }
+        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        
+        .mesa-card { 
+            background: #1e293b; border-radius: 16px; padding: 20px; text-align: center; 
+            border: 2px solid #334155; transition: all 0.2s ease; cursor: pointer;
+            display: flex; flex-direction: column; justify-content: center; min-height: 130px;
+        }
+        .mesa-card:active { transform: scale(0.95); }
+        .mesa-card.livre { border-color: #10b981; background: rgba(16, 185, 129, 0.05); }
+        .mesa-card.ocupada { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
+        
+        .mesa-numero { font-size: 2rem; font-weight: 800; color: #f8fafc; }
+        .mesa-status { font-size: 0.75rem; text-transform: uppercase; font-weight: 600; margin-top: 5px; letter-spacing: 1px; }
+        .mesa-card.livre .mesa-status { color: #10b981; }
+        .mesa-card.ocupada .mesa-status { color: #ef4444; }
+        .mesa-total { font-size: 1.1rem; font-weight: 800; color: #f59e0b; margin-top: 10px; }
+
+        /* BOTÃO FLUTUANTE (NOVA MESA) */
+        .fab-button {
+            position: fixed; bottom: 25px; right: 25px; background: #3b82f6; color: white;
+            width: 60px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center;
+            font-size: 30px; box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5); border: none; cursor: pointer; z-index: 90;
+        }
+
+        /* MODAL PREMIUM */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; align-items: flex-end; justify-content: center; }
+        .modal-content { background: #0f172a; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 25px; border-top: 1px solid #334155; animation: slideUp 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 1.5rem; font-weight: 800; color: #f8fafc; }
+        .close-btn { background: #1e293b; border: none; color: #94a3b8; width: 36px; height: 36px; border-radius: 18px; font-size: 20px; cursor: pointer; }
+        
+        /* LISTA DE ITENS NA MESA */
+        .consumo-box { background: #1e293b; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #334155; }
+        .item-row:last-child { border-bottom: none; }
+        .item-name { color: #f8fafc; font-size: 0.95rem; flex: 1; }
+        .item-price { color: #94a3b8; font-size: 0.9rem; margin-right: 10px; }
+        .btn-remove-item { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        
+        .total-row { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #334155; font-size: 1.3rem; font-weight: 800; }
+        
+        /* FORMULÁRIOS E BOTÕES */
+        label { display: block; color: #94a3b8; font-size: 0.85rem; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
+        select, input { width: 100%; background: #1e293b; border: 1px solid #334155; color: white; padding: 15px; border-radius: 12px; font-size: 1rem; margin-bottom: 15px; appearance: none; }
+        select:focus, input:focus { outline: none; border-color: #3b82f6; }
+        
+        .btn-primary { background: #3b82f6; color: white; width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-bottom: 10px; }
+        .btn-success { background: #10b981; color: white; width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-bottom: 10px; }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; width: 100%; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; }
     </style>
 </head>
-<body style="background: #111;">
-    <header class="header">
-        <div class="container" style="text-align: center;">
-            <h1 style="font-size: 2.5rem;">Mapa de Mesas</h1>
-        </div>
+<body>
+
+    <header>
+        <h1>ESQUINA COMANDA</h1>
+        <div class="subtitle">Visão do Salão</div>
     </header>
 
-    <main class="container">
-        <div id="mesa-grid" class="mesa-grid"></div>
-    </main>
+    <div class="container">
+        <div id="mesa-grid" class="mesa-grid">
+            </div>
+    </div>
+
+    <button class="fab-button" onclick="adicionarNovaMesaGarcom()">+</button>
 
     <div id="mesa-modal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="fecharModal()">&times;</span>
-            <h2 id="modal-titulo-mesa">Gestão de Mesa</h2>
-            
-            <div style="margin-top: 15px;">
-                <label style="color: var(--color-yellow-flame); font-size: 0.9rem;">Número da Mesa:</label>
-                <input type="number" id="input-numero-mesa" style="width: 100%; padding: 10px; background: #444; color: white; border: 1px solid #666; border-radius: 5px;">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-titulo-mesa">Mesa --</div>
+                <button class="close-btn" onclick="fecharModal()">&times;</button>
             </div>
 
-            <div id="itens-consumo" style="margin: 20px 0; border-bottom: 1px solid #444; padding-bottom: 10px;"></div>
-
-            <div id="area-produtos" style="margin-top: 15px; display: none;">
-                <label style="color: var(--color-yellow-flame); font-size: 0.9rem;">Adicionar ao Pedido:</label>
-                <select id="select-produto" style="width: 100%; padding: 12px; background: #333; color: white; border: 1px solid var(--color-yellow-flame); border-radius: 8px; margin-top: 5px;">
-                    <option value="">Escolha um produto...</option>
-                    <optgroup label="🍔 LANCHES">
-                        <option value="19.00">X-Burguer - R$ 19,00</option>
-                        <option value="28.00">X-Tudo - R$ 28,00</option>
-                    </optgroup>
-                    <optgroup label="🥤 BEBIDAS">
-                        <option value="6.00">Refrigerante Lata - R$ 6,00</option>
-                        <option value="10.00">Heineken - R$ 10,00</option>
-                    </optgroup>
-                </select>
-                <button onclick="adicionarItemMesa()" class="finalize-order-btn" style="background: #2ecc71; color: white; margin-top: 10px;">+ Lançar Item</button>
+            <div id="area-livre" style="display: none;">
+                <button class="btn-success" onclick="ocuparMesaGarcom()">🍽️ Ocupar Mesa Agora</button>
             </div>
 
-            <div id="area-acoes" style="margin-top: 20px;"></div>
+            <div id="area-ocupada" style="display: none;">
+                <div class="consumo-box">
+                    <div style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px; font-weight: 600;">ITENS DA CONTA</div>
+                    <div id="itens-consumo"></div>
+                    <div class="total-row">
+                        <span style="color: #f8fafc;">Total:</span>
+                        <span style="color: #f59e0b;" id="total-consumo">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <label>Lançar Novo Produto</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <select id="select-produto" style="margin-bottom: 0;">
+                        <option value="">Escolha um produto...</option>
+                        <optgroup label="🍔 LANCHES">
+                            <option value="19.00">X-Burguer</option>
+                            <option value="28.00">X-Tudo</option>
+                        </optgroup>
+                        <optgroup label="🥤 BEBIDAS">
+                            <option value="6.00">Refrigerante Lata</option>
+                            <option value="10.00">Heineken</option>
+                        </optgroup>
+                    </select>
+                    <button class="btn-primary" style="width: auto; padding: 0 25px; margin-bottom: 0;" onclick="adicionarItemGarcom()">+</button>
+                </div>
+
+                <button class="btn-danger" onclick="fecharContaGarcom()">🧾 Solicitar Fechamento de Conta</button>
+            </div>
         </div>
     </div>
 

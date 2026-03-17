@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDs17Az4-kB--3LdBs1KwPNDrEr37jYkCU",
@@ -16,7 +16,7 @@ const db = getFirestore(app);
 const mesaGrid = document.getElementById('mesa-grid');
 let mesaAtualId = null;
 
-// 1. ESCUTAR STATUS DAS MESAS
+// ESCUTAR STATUS DAS MESAS
 onSnapshot(collection(db, "mesas"), (snapshot) => {
     mesaGrid.innerHTML = "";
     snapshot.forEach((docSnap) => {
@@ -29,82 +29,120 @@ function renderMesa(id, mesa) {
     const div = document.createElement('div');
     div.className = `mesa-card ${mesa.status}`;
     div.innerHTML = `
-        <span class="mesa-numero">${mesa.numero}</span>
-        <span class="mesa-status">${mesa.status}</span>
+        <div class="mesa-numero">${mesa.numero}</div>
+        <div class="mesa-status">${mesa.status === 'ocupada' ? 'Ocupada' : 'Livre'}</div>
+        ${mesa.status === 'ocupada' ? `<div class="mesa-total">R$ ${(mesa.total || 0).toFixed(2).replace('.', ',')}</div>` : ''}
     `;
     div.onclick = () => abrirMesa(id, mesa);
     mesaGrid.appendChild(div);
 }
 
-// 2. ABRIR GESTÃO DA MESA
+// ABRIR GESTÃO DA MESA NO MODAL
 window.abrirMesa = (id, mesa) => {
     mesaAtualId = id;
-    const itensContainer = document.getElementById('itens-consumo');
-    const areaProdutos = document.getElementById('area-produtos');
-    const areaAcoes = document.getElementById('area-acoes');
-
-    document.getElementById('modal-titulo-mesa').innerText = `Mesa ${mesa.numero}`;
+    document.getElementById('modal-titulo-mesa').innerText = `MESA ${mesa.numero}`;
     
-    let htmlConsumo = `<p style="color: #888;">Consumo Total: <b>R$ ${(mesa.total || 0).toFixed(2)}</b></p><ul style="font-size: 0.9rem; padding-left: 15px;">`;
-    if (mesa.itens && mesa.itens.length > 0) {
-        mesa.itens.forEach(item => htmlConsumo += `<li>${item}</li>`);
-    } else {
-        htmlConsumo += `<li>Nenhum item lançado</li>`;
-    }
-    htmlConsumo += "</ul>";
-    itensContainer.innerHTML = htmlConsumo;
+    const areaLivre = document.getElementById('area-livre');
+    const areaOcupada = document.getElementById('area-ocupada');
+    const itensContainer = document.getElementById('itens-consumo');
+    const totalConsumo = document.getElementById('total-consumo');
 
-    if (mesa.status === 'ocupada') {
-        areaProdutos.style.display = 'block';
-        areaAcoes.innerHTML = `<button onclick="fecharContaMesa()" class="finalize-order-btn" style="background: var(--color-red-fire);">Fechar Conta e Liberar</button>`;
+    if (mesa.status === 'livre') {
+        areaLivre.style.display = 'block';
+        areaOcupada.style.display = 'none';
     } else {
-        areaProdutos.style.display = 'none';
-        areaAcoes.innerHTML = `<button onclick="confirmarOcuparMesa()" class="finalize-order-btn" style="background: #2ecc71;">Ocupar Mesa</button>`;
+        areaLivre.style.display = 'none';
+        areaOcupada.style.display = 'block';
+        
+        itensContainer.innerHTML = "";
+        if (mesa.itens && mesa.itens.length > 0) {
+            mesa.itens.forEach((itemObj, index) => {
+                const nome = typeof itemObj === 'string' ? itemObj : itemObj.nome;
+                const preco = typeof itemObj === 'string' ? 0 : (itemObj.preco || 0);
+                
+                itensContainer.innerHTML += `
+                    <div class="item-row">
+                        <span class="item-name">${nome}</span>
+                        <span class="item-price">R$ ${preco.toFixed(2).replace('.', ',')}</span>
+                        <button class="btn-remove-item" onclick="removerItemGarcom(${index}, ${preco})">Excluir</button>
+                    </div>
+                `;
+            });
+        } else {
+            itensContainer.innerHTML = `<div style="color: #64748b; padding: 10px 0; text-align: center;">Mesa vazia</div>`;
+        }
+        totalConsumo.innerText = `R$ ${(mesa.total || 0).toFixed(2).replace('.', ',')}`;
     }
 
-    document.getElementById('mesa-modal').style.display = 'block';
+    document.getElementById('mesa-modal').style.display = 'flex';
 };
 
-// 3. OCUPAR MESA
-window.confirmarOcuparMesa = async () => {
-    const novoNumero = document.getElementById('input-numero-mesa').value;
-    if(!novoNumero) return alert("Digite o número da mesa!");
-
-    const mesaRef = doc(db, "mesas", mesaAtualId);
+// OCUPAR MESA
+window.ocuparMesaGarcom = async () => {
     try {
-        await updateDoc(mesaRef, {
-            numero: Number(novoNumero),
-            status: "ocupada"
-        });
-        window.fecharModal();
-    } catch (e) {
-        console.error("Erro ao ocupar mesa:", e);
-    }
+        await updateDoc(doc(db, "mesas", mesaAtualId), { status: "ocupada" });
+        fecharModal();
+    } catch (e) { console.error(e); }
 };
 
-// 4. LANÇAR ITEM
-window.adicionarItemMesa = async () => {
+// LANÇAR ITEM (ATUALIZADO)
+window.adicionarItemGarcom = async () => {
     const select = document.getElementById('select-produto');
     const valor = parseFloat(select.value);
     const texto = select.options[select.selectedIndex].text;
-    if (!valor) return;
+    
+    if (!valor) return alert("Selecione um produto para lançar!");
 
     const mesaRef = doc(db, "mesas", mesaAtualId);
     try {
         const snap = await getDoc(mesaRef);
         const dados = snap.data();
         
+        const novoItem = { nome: texto, preco: valor };
+        
         await updateDoc(mesaRef, {
             total: (dados.total || 0) + valor,
-            itens: [...(dados.itens || []), texto] 
+            itens: [...(dados.itens || []), novoItem] 
         });
+
+        // Manda o pedido para a cozinha (Preparando)
+        await addDoc(collection(db, "pedidos"), {
+            cliente: `MESA ${dados.numero}`, status: "Preparando", data: serverTimestamp(),
+            total: 0, itens: [{ name: texto, price: 0 }], metodo: "Consumo na Mesa", pagamento: "Comanda Cozinha"
+        });
+
         select.selectedIndex = 0;
+        fecharModal();
+        alert("Item enviado para a cozinha!");
     } catch (e) { console.error(e); }
 };
 
-// 5. FECHAR CONTA
-window.fecharContaMesa = async () => {
-    if (!confirm("Deseja fechar a conta e liberar a mesa?")) return;
+// EXCLUIR ITEM ESPECÍFICO 
+window.removerItemGarcom = async (index, precoAAbater) => {
+    if(!confirm("Tem certeza que deseja remover este item da conta da mesa?")) return;
+    
+    const mesaRef = doc(db, "mesas", mesaAtualId);
+    try {
+        const snap = await getDoc(mesaRef);
+        const dados = snap.data();
+        
+        const novosItens = [...dados.itens];
+        novosItens.splice(index, 1);
+        
+        const novoTotal = Math.max(0, (dados.total || 0) - precoAAbater);
+
+        await updateDoc(mesaRef, {
+            total: novoTotal,
+            itens: novosItens
+        });
+        
+        fecharModal();
+    } catch (e) { console.error(e); }
+};
+
+// FECHAR CONTA (O garçom não recebe o dinheiro, só zera a mesa)
+window.fecharContaGarcom = async () => {
+    if (!confirm("Deseja enviar o fechamento desta conta para o Caixa? O cliente irá pagar agora.")) return;
     
     const mesaRef = doc(db, "mesas", mesaAtualId);
     try {
@@ -113,11 +151,25 @@ window.fecharContaMesa = async () => {
             total: 0,
             itens: []
         });
-        window.fecharModal();
+        fecharModal();
+        alert("Mesa liberada! Avise o caixa para receber o pagamento.");
     } catch (e) { console.error(e); }
 };
 
-// 6. AUXILIARES
+// ADICIONAR NOVA MESA 
+window.adicionarNovaMesaGarcom = async () => {
+    const numeroStr = prompt("Digite o número da nova mesa (Ex: 15):");
+    if (!numeroStr) return; 
+    
+    const numeroMesa = parseInt(numeroStr);
+    if (isNaN(numeroMesa) || numeroMesa <= 0) return alert("Número inválido.");
+    
+    try {
+        await addDoc(collection(db, "mesas"), { numero: numeroMesa, status: "livre", total: 0, itens: [] });
+    } catch (e) { console.error(e); }
+};
+
+// AUXILIARES
 window.fecharModal = () => {
     document.getElementById('mesa-modal').style.display = 'none';
 };
