@@ -527,3 +527,48 @@ window.excluirMesaAdmin = async () => {
         fecharModalMesaAdmin();
     } catch (e) { console.error(e); }
 };
+
+
+// --- MÓDULO DE FECHO DE CAIXA ---
+
+window.abrirModalFechoCaixa = () => {
+    document.getElementById('fecho-dinheiro').innerText = totalDinheiro.toFixed(2).replace('.', ',');
+    document.getElementById('fecho-pix').innerText = totalPix.toFixed(2).replace('.', ',');
+    document.getElementById('fecho-credito').innerText = totalCredito.toFixed(2).replace('.', ',');
+    document.getElementById('fecho-debito').innerText = totalDebito.toFixed(2).replace('.', ',');
+    
+    const total = totalDinheiro + totalPix + totalCredito + totalDebito;
+    document.getElementById('fecho-total').innerText = total.toFixed(2).replace('.', ',');
+    
+    document.getElementById('modal-fecho-caixa').style.display = 'flex';
+};
+
+window.fecharModalFechoCaixa = () => {
+    document.getElementById('modal-fecho-caixa').style.display = 'none';
+};
+
+window.confirmarFechoCaixa = async () => {
+    if (!confirm("Tem a certeza que deseja encerrar o caixa de hoje? Os valores serão guardados no histórico.")) return;
+    
+    try {
+        const total = totalDinheiro + totalPix + totalCredito + totalDebito;
+        
+        await addDoc(collection(db, "caixa"), {
+            data: serverTimestamp(),
+            valorFechamento: total,
+            vendasPorTipo: {
+                dinheiro: totalDinheiro,
+                pix: totalPix,
+                credito: totalCredito,
+                debito: totalDebito
+            }
+        });
+        
+        alert("Caixa encerrado com sucesso! Os dados foram guardados na nuvem.");
+        fecharModalFechoCaixa();
+        
+    } catch (e) {
+        console.error("Erro ao fechar caixa:", e);
+        alert("Erro ao encerrar o caixa. Verifique a sua conexão.");
+    }
+};

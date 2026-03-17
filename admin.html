@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* BLINDAGEM CONTRA O STYLES.CSS DO CLIENTE */
+        
         body::before { display: none !important; }
         
         body { background: radial-gradient(circle at top left, #1e293b 0%, #0f172a 100%); display: flex; min-height: 100vh; overflow: hidden; color: #f8fafc; margin: 0; font-family: 'Inter', sans-serif; }
@@ -32,7 +32,7 @@
         .kpi-label { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
         .kpi-value { font-size: 2rem; font-weight: 700; margin-top: 10px; display: block; }
 
-        /* KANBAN DE DELIVERY (CORRIGIDO) */
+        /* KANBAN DE DELIVERY  */
         .admin-container { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; align-items: flex-start; }
         .column { min-width: 320px; flex: 1; max-height: 75vh; overflow-y: auto; padding: 20px; }
         
@@ -42,18 +42,18 @@
         .order-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; color: #f8fafc; }
         .order-items { margin: 10px 0; padding: 10px 0; border-top: 1px dashed #334155; border-bottom: 1px dashed #334155; color: #cbd5e1; }
         
-        /* BOTÕES DO PEDIDO (SaaS Style) */
+        /* BOTÕES DO PEDIDO  */
         .admin-btns { display: flex; gap: 8px; margin-top: 15px; }
         .admin-btns button { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         .btn-accept { background: #3b82f6; } .btn-accept:hover { background: #2563eb; }
         .btn-done { background: #10b981; } .btn-done:hover { background: #059669; }
         .btn-cancel { background: #ef4444; } .btn-cancel:hover { background: #dc2626; }
 
-        /* MAPA DE MESAS (CORRIGIDO) */
+        /* MAPA DE MESAS  */
         .mesa-grid-admin { display: flex; flex-wrap: wrap; gap: 15px; }
-        .mesa-grid-admin > div { width: 160px !important; flex: none !important; } /* Impede que a mesa ocupe a tela toda */
+        .mesa-grid-admin > div { width: 160px !important; flex: none !important; }
 
-        /* MODALS (BLINDADOS E CORRIGIDOS) */
+        /* MODALS  */
         .modal { display: none; position: fixed !important; z-index: 9999 !important; left: 0; top: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.8) !important; backdrop-filter: blur(5px); align-items: center; justify-content: center; }
         .modal-content { background: #1e293b !important; padding: 25px; border-radius: 16px; width: 90%; max-width: 450px; border: 1px solid #334155; position: relative; margin: 5vh auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
         .close-button { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #94a3b8; }
@@ -78,7 +78,9 @@
         <section id="v-dashboard" class="view-section active">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                 <div><h1 style="margin: 0;">Visão Geral</h1><p id="data-hoje" style="color: #94a3b8; font-size: 0.9rem; margin: 5px 0 0 0;"></p></div>
+                <button onclick="abrirModalFechoCaixa()" style="padding: 12px 20px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🔒 Fechar Caixa</button>
             </div>
+            
             <div id="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px;"></div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 25px;">
                 <div class="kpi-card" style="padding: 20px;"><h3 style="color: #f8fafc; font-size: 1.1rem; margin-bottom: 15px;">Vendas Diárias</h3><canvas id="chartLinha" style="max-height: 250px;"></canvas></div>
@@ -95,9 +97,7 @@
                 </div>
             </div>
             <div id="mesa-grid-admin" class="mesa-grid-admin"></div>
-        </section
-
-        <section id="v-delivery" class="view-section">
+        </section> <section id="v-delivery" class="view-section">
             <h1 style="margin-bottom: 20px;">Pedidos de Saída</h1>
             <div class="admin-container">
                 <div class="column"><h2>📥 Pendentes</h2><div id="col-pendente"></div></div>
@@ -146,7 +146,7 @@
                 <div style="border-top: 1px solid #334155; padding-top: 10px; text-align: right; font-size: 1.2rem; color: #f8fafc;">Total: <b style="color: #10b981;">R$ <span id="total-balcao">0.00</span></b></div>
             </div>
 
-               <select id="pagamento-balcao" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; margin-bottom: 15px;">
+            <select id="pagamento-balcao" style="width: 100%; padding: 12px; background: #0f172a; color: white; border: 1px solid #334155; border-radius: 8px; margin-bottom: 15px;">
                 <option value="Dinheiro">💵 Dinheiro</option>
                 <option value="Pix">💠 Pix</option>
                 <option value="Cartão de Crédito">💳 Cartão de Crédito</option>
@@ -176,6 +176,43 @@
             </div>
 
             <div id="area-acoes-mesa-admin" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <div id="modal-fecho-caixa" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="fecharModalFechoCaixa()">&times;</span>
+            <h2 style="color: #f8fafc; font-size: 1.5rem !important; margin-bottom: 20px;">🔒 Fecho de Caixa</h2>
+            
+            <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;">Confira os valores antes de encerrar o dia:</p>
+
+            <div style="background: #0f172a; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h3 style="color: #94a3b8; font-size: 1rem; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px;">Resumo de Entradas</h3>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
+                    <span style="color: #10b981;">💵 Dinheiro (Gaveta):</span>
+                    <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-dinheiro">0,00</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
+                    <span style="color: #8b5cf6;">💠 Pix:</span>
+                    <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-pix">0,00</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
+                    <span style="color: #3b82f6;">💳 Cartão de Crédito:</span>
+                    <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-credito">0,00</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
+                    <span style="color: #f59e0b;">💳 Cartão de Débito:</span>
+                    <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-debito">0,00</span></span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #334155; font-size: 1.3rem;">
+                    <span style="color: #94a3b8;">Total Faturado:</span>
+                    <span style="font-weight: bold; color: #10b981;">R$ <span id="fecho-total">0,00</span></span>
+                </div>
+            </div>
+
+            <button onclick="confirmarFechoCaixa()" style="background: #ef4444; width: 100%; padding: 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem;">⚠️ Confirmar e Encerrar o Dia</button>
         </div>
     </div>
 
