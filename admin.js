@@ -289,13 +289,24 @@ window.finalizarPedidoBalcao = async () => {
 };
 
 //  PARA CRIAR O CARD DO PEDIDO
+// PARA CRIAR O CARD DO PEDIDO
 function renderCard(id, pedido) {
     const card = document.createElement('div');
     card.classList.add('order-card');
     if (pedido.status === "Preparando") card.classList.add('preparando');
     if (pedido.status === "Finalizado") card.classList.add('finalizado');
     
-    const ehEntrega = pedido.metodo && pedido.metodo.toLowerCase() === 'entrega';
+    let metodoVisual = "Retirada";
+    let iconeMetodo = "🥡"; 
+    const metodoDB = pedido.metodo ? pedido.metodo.toLowerCase() : "";
+
+    if (metodoDB.includes('entrega')) {
+        metodoVisual = "Entrega";
+        iconeMetodo = "🛵";
+    } else if (metodoDB.includes('mesa') || metodoDB.includes('salão')) {
+        metodoVisual = "Consumo na Mesa";
+        iconeMetodo = "🍽️";
+    }
 
     let itensHtml = "";
     pedido.itens.forEach(i => {
@@ -307,15 +318,15 @@ function renderCard(id, pedido) {
             <span>👤 ${pedido.cliente}</span>
             <span>💰 R$ ${pedido.total.toFixed(2).replace('.', ',')}</span>
         </div>
-        <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 5px;">
-            🛵 ${ehEntrega ? 'Entrega' : 'Retirada'} | 💳 ${pedido.pagamento}
+        <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px; font-weight: bold;">
+            ${iconeMetodo} ${metodoVisual} | 💳 ${pedido.pagamento}
         </div>
         
-        ${ehEntrega ? `<div style="font-size: 0.8rem; color: #ccc; margin-bottom: 8px;">📍 ${pedido.endereco}</div>` : ''}
+        ${metodoVisual === "Entrega" && pedido.endereco ? `<div style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 8px;">📍 ${pedido.endereco}</div>` : ''}
         
         <div class="order-items">${itensHtml}</div>
         
-        ${pedido.obs ? `<div style="color: #ffc300; font-size: 0.8rem; margin-top: 5px;">📝 <b>Obs:</b> ${pedido.obs}</div>` : ''}
+        ${pedido.obs ? `<div style="color: #f59e0b; font-size: 0.8rem; margin-top: 5px;">📝 <b>Obs:</b> ${pedido.obs}</div>` : ''}
         
         <div class="admin-btns" style="margin-top: 15px;">
             ${pedido.status === "Pendente" ? `<button class="btn-accept" onclick="alterarStatus('${id}', 'Preparando')">Aceitar</button>` : ''}
@@ -529,16 +540,54 @@ window.excluirMesaAdmin = async () => {
 };
 
 
-// --- MÓDULO DE FECHO DE CAIXA ---
+// --- MÓDULO DE ABERTURA E FECHO DE CAIXA ---
+
+let valorAberturaCaixa = parseFloat(localStorage.getItem('esquina_valorAbertura')) || 0;
+let caixaAberto = localStorage.getItem('esquina_caixaAberto') === 'true';
+
+function atualizarBotoesCaixa() {
+    if (caixaAberto) {
+        document.getElementById('btn-abrir-caixa').style.display = 'none';
+        document.getElementById('btn-fechar-caixa').style.display = 'block';
+    } else {
+        document.getElementById('btn-abrir-caixa').style.display = 'block';
+        document.getElementById('btn-fechar-caixa').style.display = 'none';
+    }
+}
+
+setTimeout(atualizarBotoesCaixa, 500);
+
+window.abrirCaixaManha = () => {
+    const valorStr = prompt("Qual o valor do Fundo de Troco que está na gaveta agora? (Ex: 50.00)");
+    if (valorStr === null) return; // Cancelou
+    
+    const valor = parseFloat(valorStr.replace(',', '.'));
+    if (isNaN(valor) || valor < 0) return alert("Por favor, digite um valor válido.");
+
+    
+    valorAberturaCaixa = valor;
+    caixaAberto = true;
+    localStorage.setItem('esquina_valorAbertura', valorAberturaCaixa);
+    localStorage.setItem('esquina_caixaAberto', 'true');
+    
+    atualizarBotoesCaixa();
+    alert(`Caixa aberto com sucesso! Fundo de troco: R$ ${valor.toFixed(2).replace('.', ',')}`);
+};
 
 window.abrirModalFechoCaixa = () => {
+    document.getElementById('fecho-troco').innerText = valorAberturaCaixa.toFixed(2).replace('.', ',');
     document.getElementById('fecho-dinheiro').innerText = totalDinheiro.toFixed(2).replace('.', ',');
-    document.getElementById('fecho-pix').innerText = totalPix.toFixed(2).replace('.', ',');
-    document.getElementById('fecho-credito').innerText = totalCredito.toFixed(2).replace('.', ',');
-    document.getElementById('fecho-debito').innerText = totalDebito.toFixed(2).replace('.', ',');
     
-    const total = totalDinheiro + totalPix + totalCredito + totalDebito;
-    document.getElementById('fecho-total').innerText = total.toFixed(2).replace('.', ',');
+    const esperadoGaveta = valorAberturaCaixa + totalDinheiro;
+    document.getElementById('fecho-esperado-gaveta').innerText = esperadoGaveta.toFixed(2).replace('.', ',');
+
+    document.getElementById('fecho-pix').innerText = totalPix.toFixed(2).replace('.', ',');
+    
+    const cartoes = totalCredito + totalDebito;
+    document.getElementById('fecho-cartoes').innerText = cartoes.toFixed(2).replace('.', ',');
+    
+    const totalFaturado = totalDinheiro + totalPix + cartoes;
+    document.getElementById('fecho-total').innerText = totalFaturado.toFixed(2).replace('.', ',');
     
     document.getElementById('modal-fecho-caixa').style.display = 'flex';
 };
@@ -548,14 +597,15 @@ window.fecharModalFechoCaixa = () => {
 };
 
 window.confirmarFechoCaixa = async () => {
-    if (!confirm("Tem a certeza que deseja encerrar o caixa de hoje? Os valores serão guardados no histórico.")) return;
+    if (!confirm("Tem a certeza que deseja encerrar o caixa de hoje?")) return;
     
     try {
-        const total = totalDinheiro + totalPix + totalCredito + totalDebito;
+        const totalVendas = totalDinheiro + totalPix + totalCredito + totalDebito;
         
         await addDoc(collection(db, "caixa"), {
             data: serverTimestamp(),
-            valorFechamento: total,
+            valorAbertura: valorAberturaCaixa,
+            valorFechamento: totalVendas,
             vendasPorTipo: {
                 dinheiro: totalDinheiro,
                 pix: totalPix,
@@ -564,8 +614,14 @@ window.confirmarFechoCaixa = async () => {
             }
         });
         
-        alert("Caixa encerrado com sucesso! Os dados foram guardados na nuvem.");
+        caixaAberto = false;
+        valorAberturaCaixa = 0;
+        localStorage.removeItem('esquina_caixaAberto');
+        localStorage.removeItem('esquina_valorAbertura');
+        
+        atualizarBotoesCaixa();
         fecharModalFechoCaixa();
+        alert("Caixa encerrado e gravado no Histórico com sucesso!");
         
     } catch (e) {
         console.error("Erro ao fechar caixa:", e);

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        
+
         body::before { display: none !important; }
         
         body { background: radial-gradient(circle at top left, #1e293b 0%, #0f172a 100%); display: flex; min-height: 100vh; overflow: hidden; color: #f8fafc; margin: 0; font-family: 'Inter', sans-serif; }
@@ -78,7 +78,10 @@
         <section id="v-dashboard" class="view-section active">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                 <div><h1 style="margin: 0;">Visão Geral</h1><p id="data-hoje" style="color: #94a3b8; font-size: 0.9rem; margin: 5px 0 0 0;"></p></div>
-                <button onclick="abrirModalFechoCaixa()" style="padding: 12px 20px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🔒 Fechar Caixa</button>
+                <div style="display: flex; gap: 10px;">
+                    <button id="btn-abrir-caixa" onclick="abrirCaixaManha()" style="padding: 12px 20px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🔓 Abrir Caixa</button>
+                    <button id="btn-fechar-caixa" onclick="abrirModalFechoCaixa()" style="display: none; padding: 12px 20px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">🔒 Fechar Caixa</button>
+                </div>
             </div>
             
             <div id="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px;"></div>
@@ -184,30 +187,35 @@
             <span class="close-button" onclick="fecharModalFechoCaixa()">&times;</span>
             <h2 style="color: #f8fafc; font-size: 1.5rem !important; margin-bottom: 20px;">🔒 Fecho de Caixa</h2>
             
-            <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;">Confira os valores antes de encerrar o dia:</p>
-
             <div style="background: #0f172a; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h3 style="color: #94a3b8; font-size: 1rem; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px;">Resumo de Entradas</h3>
+                <h3 style="color: #94a3b8; font-size: 1rem; margin-bottom: 15px; border-bottom: 1px solid #334155; padding-bottom: 10px;">Conferência da Gaveta</h3>
                 
                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
-                    <span style="color: #10b981;">💵 Dinheiro (Gaveta):</span>
+                    <span style="color: #94a3b8;">🪙 Fundo de Troco (Abertura):</span>
+                    <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-troco">0,00</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
+                    <span style="color: #10b981;">💵 Vendas em Dinheiro:</span>
                     <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-dinheiro">0,00</span></span>
                 </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #334155; font-size: 1.1rem;">
+                    <span style="color: #f59e0b; font-weight: bold;">💰 Esperado na Gaveta:</span>
+                    <span style="font-weight: bold; color: #f59e0b;">R$ <span id="fecho-esperado-gaveta">0,00</span></span>
+                </div>
+
+                <h3 style="color: #94a3b8; font-size: 1rem; margin-bottom: 15px; margin-top: 20px; border-bottom: 1px solid #334155; padding-bottom: 10px;">Vendas Digitais</h3>
+
                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
                     <span style="color: #8b5cf6;">💠 Pix:</span>
                     <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-pix">0,00</span></span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
-                    <span style="color: #3b82f6;">💳 Cartão de Crédito:</span>
-                    <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-credito">0,00</span></span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.1rem;">
-                    <span style="color: #f59e0b;">💳 Cartão de Débito:</span>
-                    <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-debito">0,00</span></span>
+                    <span style="color: #3b82f6;">💳 Cartões (Crédito/Débito):</span>
+                    <span style="font-weight: bold; color: #f8fafc;">R$ <span id="fecho-cartoes">0,00</span></span>
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #334155; font-size: 1.3rem;">
-                    <span style="color: #94a3b8;">Total Faturado:</span>
+                    <span style="color: #94a3b8;">Total Faturado Hoje:</span>
                     <span style="font-weight: bold; color: #10b981;">R$ <span id="fecho-total">0,00</span></span>
                 </div>
             </div>
