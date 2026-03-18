@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lanchonete Esquina do Sabor - Cardápio</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-  <header class="header">
+    <header class="header">
         <div class="container header-container">
             <img src="Imagens/Logo.png" alt="Logo Esquina do Sabor" class="header-logo">
-            
+
             <div class="header-text">
                 <h1>Esquina do Sabor</h1>
                 <p class="slogan">Lanches e Porções</p>
@@ -24,105 +26,139 @@
             <img src="Imagens/Mascote.png" alt="Mascote Esquina do Sabor" class="header-mascot">
         </div>
     </header>
-    
-    <nav class="category-nav">
-        <ul class="nav-list">
-            <li><a href="#lanches" class="active">🍔 Lanches</a></li>
-            <li><a href="#hotdogs">🌭 Hot Dog's</a></li>
-            <li><a href="#porcoes">🍟 Porções</a></li>
-            <li><a href="#adicionais">✨ Adicionais</a></li>
-            <li><a href="#bebidas">🥤 Bebidas</a></li>
-        </ul>
+
+    <div class="mobile-header-bar">
+        <span class="mobile-brand">🍔 Esquina do Sabor</span>
+        <button id="hamburger-btn" class="hamburger-btn">☰</button>
+    </div>
+
+    <nav id="sidebar-nav" class="sidebar-nav">
+        <button id="close-sidebar" class="close-sidebar">&times;</button>
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="#lanches">🍔 Lanches</a></li>
+                <li><a href="#hotdogs">🌭 Hot Dog's</a></li>
+                <li><a href="#porcoes">🍟 Porções</a></li>
+                <li><a href="#adicionais">✨ Adicionais</a></li>
+                <li><a href="#bebidas">🥤 Bebidas</a></li>
+            </ul>
+        </div>
     </nav>
 
     <main class="container">
-        
+
         <section id="lanches">
             <h2 class="fade-in">🍔 Lanches e Burguer's</h2>
             <div class="menu-grid">
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-BURGUER</span><span class="item-price">R$ 19,00</span></div>
+                    <div class="item-details"><span class="item-name">X-BURGUER</span><span class="item-price">R$
+                            19,00</span></div>
                     <p class="item-description">(PÃO, HAMBURGUER ARTESANAL, PRESUNTO E MUÇARELA)</p>
                     <button class="add-to-cart-btn" data-name="X-Burguer" data-price="19.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-SALADA</span><span class="item-price">R$ 20,00</span></div>
+                    <div class="item-details"><span class="item-name">X-SALADA</span><span class="item-price">R$
+                            20,00</span></div>
                     <p class="item-description">(PÃO, ALFACE, TOMATE, HAMBURGUER ARTESANAL, PRESUNTO E MUÇARELA)</p>
                     <button class="add-to-cart-btn" data-name="X-Salada" data-price="20.00">+</button>
                 </div>
-                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-TUDO</span><span class="item-price">R$ 28,00</span></div>
-                    <p class="item-description">(PÃO, ALFACE, TOMATE, 2 OVOS, HAMBURGUER ARTESANAL, PRESUNTO, MILHO, MUÇARELA, CALABRESA DEFUMADA, CATUPIRY E BACON)</p>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">X-TUDO</span><span class="item-price">R$
+                            28,00</span></div>
+                    <p class="item-description">(PÃO, ALFACE, TOMATE, 2 OVOS, HAMBURGUER ARTESANAL, PRESUNTO, MILHO,
+                        MUÇARELA, CALABRESA DEFUMADA, CATUPIRY E BACON)</p>
                     <button class="add-to-cart-btn" data-name="X-Tudo" data-price="28.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">BAURU</span><span class="item-price">R$ 28,00</span></div>
-                    <p class="item-description">(PÃO DE SAL ESPECIAL, CEBOLÁ E TOMATE REFOGADO, FILÉ MIGNON, MUÇARELA)</p>
+                    <div class="item-details"><span class="item-name">BAURU</span><span class="item-price">R$
+                            28,00</span></div>
+                    <p class="item-description">(PÃO DE SAL ESPECIAL, CEBOLÁ E TOMATE REFOGADO, FILÉ MIGNON, MUÇARELA)
+                    </p>
                     <button class="add-to-cart-btn" data-name="Bauru" data-price="28.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">FILÉ TUDO</span><span class="item-price">R$ 31,00</span></div>
-                    <p class="item-description">(PÃO DE SAL ESPECIAL, ALFACE, TOMATE, PRESUNTO, 2 OVOS, MILHO, MUÇARELA, FILÉ MIGNON, CALABRESA, CATUPIRY E BACON)</p>
+                    <div class="item-details"><span class="item-name">FILÉ TUDO</span><span class="item-price">R$
+                            31,00</span></div>
+                    <p class="item-description">(PÃO DE SAL ESPECIAL, ALFACE, TOMATE, PRESUNTO, 2 OVOS, MILHO, MUÇARELA,
+                        FILÉ MIGNON, CALABRESA, CATUPIRY E BACON)</p>
                     <button class="add-to-cart-btn" data-name="Filé Tudo" data-price="31.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X CONTRA FILÉ</span><span class="item-price">R$ 28,00</span></div>
-                    <p class="item-description">(PÃO DE SAL ESPECIAL, ALFACE, TOMATE, PRESUNTO, CONTRA FILÉ E MUÇARELA)</p>
+                    <div class="item-details"><span class="item-name">X CONTRA FILÉ</span><span class="item-price">R$
+                            28,00</span></div>
+                    <p class="item-description">(PÃO DE SAL ESPECIAL, ALFACE, TOMATE, PRESUNTO, CONTRA FILÉ E MUÇARELA)
+                    </p>
                     <button class="add-to-cart-btn" data-name="X Contra Filé" data-price="28.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">MISTO QUENTE</span><span class="item-price">R$ 18,00</span></div>
+                    <div class="item-details"><span class="item-name">MISTO QUENTE</span><span class="item-price">R$
+                            18,00</span></div>
                     <p class="item-description">(PÃO, PRESUNTO E MUÇARELA)</p>
                     <button class="add-to-cart-btn" data-name="Misto Quente" data-price="18.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">MISTO FRIO</span><span class="item-price">R$ 18,00</span></div>
+                    <div class="item-details"><span class="item-name">MISTO FRIO</span><span class="item-price">R$
+                            18,00</span></div>
                     <p class="item-description">(PÃO, ALFACE, TOMATE, PRESUNTO E MUÇARELA)</p>
                     <button class="add-to-cart-btn" data-name="Misto Frio" data-price="18.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">BAURU DE PRESUNTO</span><span class="item-price">R$ 22,00</span></div>
+                    <div class="item-details"><span class="item-name">BAURU DE PRESUNTO</span><span
+                            class="item-price">R$ 22,00</span></div>
                     <p class="item-description">(PÃO, PRESUNTO, MUÇARELA, TOMATE E CEBOLA)</p>
                     <button class="add-to-cart-btn" data-name="Bauru de Presunto" data-price="22.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-MILHO</span><span class="item-price">R$ 23,00</span></div>
-                    <p class="item-description">(PÃO, ALFACE, TOMATE, HAMBURGUER ARTESANAL, PRESUNTO, MILHO E MUÇARELA)</p>
+                    <div class="item-details"><span class="item-name">X-MILHO</span><span class="item-price">R$
+                            23,00</span></div>
+                    <p class="item-description">(PÃO, ALFACE, TOMATE, HAMBURGUER ARTESANAL, PRESUNTO, MILHO E MUÇARELA)
+                    </p>
                     <button class="add-to-cart-btn" data-name="X-Milho" data-price="23.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-EGG</span><span class="item-price">R$ 24,00</span></div>
-                    <p class="item-description">(PÃO, ALFACE, TOMATE, 2 OVOS, HAMBURGUER ARTESANAL, PRESUNTO, MILHO E MUÇARELA)</p>
+                    <div class="item-details"><span class="item-name">X-EGG</span><span class="item-price">R$
+                            24,00</span></div>
+                    <p class="item-description">(PÃO, ALFACE, TOMATE, 2 OVOS, HAMBURGUER ARTESANAL, PRESUNTO, MILHO E
+                        MUÇARELA)</p>
                     <button class="add-to-cart-btn" data-name="X-Egg" data-price="24.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-VEGETARIANO</span><span class="item-price">R$ 21,00</span></div>
+                    <div class="item-details"><span class="item-name">X-VEGETARIANO</span><span class="item-price">R$
+                            21,00</span></div>
                     <p class="item-description">(PÃO, ALFACE, TOMATE, 2 OVOS, MILHO, CATUPIRY, PROVOLONE E MUÇARELA)</p>
                     <button class="add-to-cart-btn" data-name="X-Vegetariano" data-price="21.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-4 QUEIJOS</span><span class="item-price">R$ 24,00</span></div>
+                    <div class="item-details"><span class="item-name">X-4 QUEIJOS</span><span class="item-price">R$
+                            24,00</span></div>
                     <p class="item-description">(PÃO, HAMBURGUER ARTESANAL, CATUPIRY, CHEDDAR, PROVOLONE E MUÇARELA)</p>
                     <button class="add-to-cart-btn" data-name="X-4 Queijos" data-price="24.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-BACON</span><span class="item-price">R$ 24,00</span></div>
-                    <p class="item-description">(PÃO, ALFACE, TOMATE, HAMBURGUER ARTESANAL, PRESUNTO, MUÇARELA E BACON)</p>
+                    <div class="item-details"><span class="item-name">X-BACON</span><span class="item-price">R$
+                            24,00</span></div>
+                    <p class="item-description">(PÃO, ALFACE, TOMATE, HAMBURGUER ARTESANAL, PRESUNTO, MUÇARELA E BACON)
+                    </p>
                     <button class="add-to-cart-btn" data-name="X-Bacon" data-price="24.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-CALABRESA</span><span class="item-price">R$ 22,00</span></div>
-                    <p class="item-description">(PÃO, ALFACE, TOMATE, HAMBURGUER ARTESANAL, PRESUNTO, MUÇARELA E CALABRESA DEFUMADA)</p>
+                    <div class="item-details"><span class="item-name">X-CALABRESA</span><span class="item-price">R$
+                            22,00</span></div>
+                    <p class="item-description">(PÃO, ALFACE, TOMATE, HAMBURGUER ARTESANAL, PRESUNTO, MUÇARELA E
+                        CALABRESA DEFUMADA)</p>
                     <button class="add-to-cart-btn" data-name="X-Calabresa" data-price="22.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-FRANGO C/CATUPIRY</span><span class="item-price">R$ 27,00</span></div>
+                    <div class="item-details"><span class="item-name">X-FRANGO C/CATUPIRY</span><span
+                            class="item-price">R$ 27,00</span></div>
                     <p class="item-description">(PÃO, ALFACE, TOMATE, 2 OVOS, FRANGO, MILHO, CATUPIRY, MUÇARELA)</p>
                     <button class="add-to-cart-btn" data-name="X-Frango c/ Catupiry" data-price="27.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">X-FRANGO TUDO</span><span class="item-price">R$ 28,00</span></div>
-                    <p class="item-description">(PÃO, ALFACE, TOMATE, 2 OVOS, PRESUNTO, FRANGO, MILHO, CATUPIRY, MUÇARELA, CALABRESA E BACON)</p>
+                    <div class="item-details"><span class="item-name">X-FRANGO TUDO</span><span class="item-price">R$
+                            28,00</span></div>
+                    <p class="item-description">(PÃO, ALFACE, TOMATE, 2 OVOS, PRESUNTO, FRANGO, MILHO, CATUPIRY,
+                        MUÇARELA, CALABRESA E BACON)</p>
                     <button class="add-to-cart-btn" data-name="X-Frango Tudo" data-price="28.00">+</button>
                 </div>
             </div>
@@ -130,35 +166,46 @@
 
         <section id="hotdogs">
             <h2 class="fade-in">🌭 Hot Dog's</h2>
-             <div class="menu-grid">
+            <div class="menu-grid">
                 <div class="menu-card fade-in">
-                    <div class="item-details"> <span class="item-name">DOG TRADICIONAL</span> <span class="item-price">R$ 12,00</span> </div>
+                    <div class="item-details"> <span class="item-name">DOG TRADICIONAL</span> <span
+                            class="item-price">R$ 12,00</span> </div>
                     <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO SALSICHE E PATATA PALHA)</p>
                     <button class="add-to-cart-btn" data-name="Dog Tradicional" data-price="12.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"> <span class="item-name">DOG SALADA</span> <span class="item-price">R$ 14,00</span> </div>
-                    <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO, ALFACE, TOMATE, SALSICHA, E BATATA PALHA)</p>
+                    <div class="item-details"> <span class="item-name">DOG SALADA</span> <span class="item-price">R$
+                            14,00</span> </div>
+                    <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO, ALFACE, TOMATE, SALSICHA, E
+                        BATATA PALHA)</p>
                     <button class="add-to-cart-btn" data-name="Dog Salada" data-price="14.00">+</button>
                 </div>
-                 <div class="menu-card fade-in">
-                    <div class="item-details"> <span class="item-name">DOG ESPECIAL</span> <span class="item-price">R$ 22,00</span> </div>
-                    <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO, FRANGO, SALSICHA, CATUPIRY, BACON E BATATA PALHA.)</p>
+                <div class="menu-card fade-in">
+                    <div class="item-details"> <span class="item-name">DOG ESPECIAL</span> <span class="item-price">R$
+                            22,00</span> </div>
+                    <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO, FRANGO, SALSICHA, CATUPIRY,
+                        BACON E BATATA PALHA.)</p>
                     <button class="add-to-cart-btn" data-name="Dog Especial" data-price="22.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"> <span class="item-name">DOG BACON</span> <span class="item-price">R$ 18,00</span> </div>
-                    <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO, SALSICHA, BACON, E BATATA PALHA)</p>
+                    <div class="item-details"> <span class="item-name">DOG BACON</span> <span class="item-price">R$
+                            18,00</span> </div>
+                    <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO, SALSICHA, BACON, E BATATA
+                        PALHA)</p>
                     <button class="add-to-cart-btn" data-name="Dog Bacon" data-price="18.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"> <span class="item-name">DOG FRANGO</span> <span class="item-price">R$ 18,00</span> </div>
-                    <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO, FRANGO, SALSICHA E BATATA PALHA)</p>
+                    <div class="item-details"> <span class="item-name">DOG FRANGO</span> <span class="item-price">R$
+                            18,00</span> </div>
+                    <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO, FRANGO, SALSICHA E BATATA
+                        PALHA)</p>
                     <button class="add-to-cart-btn" data-name="Dog Frango" data-price="18.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                    <div class="item-details"> <span class="item-name">DOG PIZZA</span> <span class="item-price">R$ 18,00</span> </div>
-                    <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO, PRESUNTO, MUÇARELA, TOMATE, AZEITONAS, ORÉGANO, SALSICHA E BATATA PALHA)</p>
+                    <div class="item-details"> <span class="item-name">DOG PIZZA</span> <span class="item-price">R$
+                            18,00</span> </div>
+                    <p class="item-description">(PÃO, MAIONESE, KETCHUP, MOSTARDA, MILHO, PRESUNTO, MUÇARELA, TOMATE,
+                        AZEITONAS, ORÉGANO, SALSICHA E BATATA PALHA)</p>
                     <button class="add-to-cart-btn" data-name="Dog Pizza" data-price="18.00">+</button>
                 </div>
             </div>
@@ -169,73 +216,92 @@
             <p class="section-legend">Adicione o tamanho desejado ao carrinho</p>
             <div class="menu-grid">
                 <div class="menu-card fade-in">
-                     <div class="item-details"><span class="item-name">CALABRESA ACEBOLADA</span></div>
+                    <div class="item-details"><span class="item-name">CALABRESA ACEBOLADA</span></div>
                     <div class="portion-buttons">
-                        <button class="add-to-cart-btn portion-btn" data-name="Calabresa Acebolada (Meia)" data-price="27.00">Meia <br> R$ 27,00</button>
-                        <button class="add-to-cart-btn portion-btn" data-name="Calabresa Acebolada (Inteira)" data-price="38.00">Inteira <br> R$ 38,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Calabresa Acebolada (Meia)"
+                            data-price="27.00">Meia <br> R$ 27,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Calabresa Acebolada (Inteira)"
+                            data-price="38.00">Inteira <br> R$ 38,00</button>
                     </div>
                 </div>
                 <div class="menu-card fade-in">
-                     <div class="item-details"><span class="item-name">BATATA FRITA</span></div>
+                    <div class="item-details"><span class="item-name">BATATA FRITA</span></div>
                     <div class="portion-buttons">
-                        <button class="add-to-cart-btn portion-btn" data-name="Batata Frita (Meia)" data-price="18.00">Meia <br> R$ 18,00</button>
-                        <button class="add-to-cart-btn portion-btn" data-name="Batata Frita (Inteira)" data-price="24.00">Inteira <br> R$ 24,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Batata Frita (Meia)"
+                            data-price="18.00">Meia <br> R$ 18,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Batata Frita (Inteira)"
+                            data-price="24.00">Inteira <br> R$ 24,00</button>
                     </div>
                 </div>
                 <div class="menu-card fade-in">
-                     <div class="item-details"><span class="item-name">BATATA FRITA COMPLETA</span></div>
-                     <p class="item-description">(BATATA, BAICON, CALABRESA E UM TIPO DE QUEIJO)</p>
+                    <div class="item-details"><span class="item-name">BATATA FRITA COMPLETA</span></div>
+                    <p class="item-description">(BATATA, BAICON, CALABRESA E UM TIPO DE QUEIJO)</p>
                     <div class="portion-buttons">
-                        <button class="add-to-cart-btn portion-btn" data-name="Batata Completa (Meia)" data-price="24.00">Meia <br> R$ 24,00</button>
-                        <button class="add-to-cart-btn portion-btn" data-name="Batata Completa (Inteira)" data-price="32.00">Inteira <br> R$ 32,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Batata Completa (Meia)"
+                            data-price="24.00">Meia <br> R$ 24,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Batata Completa (Inteira)"
+                            data-price="32.00">Inteira <br> R$ 32,00</button>
                     </div>
                 </div>
-                 <div class="menu-card fade-in">
-                    <div class="item-details"><span class="item-name">SALAME</span><span class="item-price">R$ 20,00</span></div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">SALAME</span><span class="item-price">R$
+                            20,00</span></div>
                     <p class="item-description">(Porção única)</p>
                     <button class="add-to-cart-btn" data-name="Salame" data-price="20.00">+</button>
                 </div>
                 <div class="menu-card fade-in">
-                     <div class="item-details"><span class="item-name">POLENTA FRITA</span></div>
+                    <div class="item-details"><span class="item-name">POLENTA FRITA</span></div>
                     <div class="portion-buttons">
-                        <button class="add-to-cart-btn portion-btn" data-name="Polenta Frita (Meia)" data-price="20.00">Meia <br> R$ 20,00</button>
-                        <button class="add-to-cart-btn portion-btn" data-name="Polenta Frita (Inteira)" data-price="28.00">Inteira <br> R$ 28,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Polenta Frita (Meia)"
+                            data-price="20.00">Meia <br> R$ 20,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Polenta Frita (Inteira)"
+                            data-price="28.00">Inteira <br> R$ 28,00</button>
                     </div>
                 </div>
                 <div class="menu-card fade-in">
-                     <div class="item-details"><span class="item-name">FILÉ MIGNON</span></div>
+                    <div class="item-details"><span class="item-name">FILÉ MIGNON</span></div>
                     <div class="portion-buttons">
-                        <button class="add-to-cart-btn portion-btn" data-name="Filé Mignon (Meia)" data-price="45.00">Meia <br> R$ 45,00</button>
-                        <button class="add-to-cart-btn portion-btn" data-name="Filé Mignon (Inteira)" data-price="70.00">Inteira <br> R$ 70,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Filé Mignon (Meia)"
+                            data-price="45.00">Meia <br> R$ 45,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Filé Mignon (Inteira)"
+                            data-price="70.00">Inteira <br> R$ 70,00</button>
                     </div>
                 </div>
                 <div class="menu-card fade-in">
-                     <div class="item-details"><span class="item-name">FILÉ DE FRANGO</span></div>
+                    <div class="item-details"><span class="item-name">FILÉ DE FRANGO</span></div>
                     <div class="portion-buttons">
-                        <button class="add-to-cart-btn portion-btn" data-name="Filé de Frango (Meia)" data-price="28.00">Meia <br> R$ 28,00</button>
-                        <button class="add-to-cart-btn portion-btn" data-name="Filé de Frango (Inteira)" data-price="38.00">Inteira <br> R$ 38,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Filé de Frango (Meia)"
+                            data-price="28.00">Meia <br> R$ 28,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Filé de Frango (Inteira)"
+                            data-price="38.00">Inteira <br> R$ 38,00</button>
                     </div>
                 </div>
                 <div class="menu-card fade-in">
-                     <div class="item-details"><span class="item-name">CONTRA - FILÉ</span></div>
+                    <div class="item-details"><span class="item-name">CONTRA - FILÉ</span></div>
                     <div class="portion-buttons">
-                        <button class="add-to-cart-btn portion-btn" data-name="Contra Filé (Meia)" data-price="35.00">Meia <br> R$ 35,00</button>
-                        <button class="add-to-cart-btn portion-btn" data-name="Contra Filé (Inteira)" data-price="50.00">Inteira <br> R$ 50,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Contra Filé (Meia)"
+                            data-price="35.00">Meia <br> R$ 35,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Contra Filé (Inteira)"
+                            data-price="50.00">Inteira <br> R$ 50,00</button>
                     </div>
                 </div>
                 <div class="menu-card fade-in">
-                     <div class="item-details"><span class="item-name">MISTA DE CARNES</span></div>
-                     <p class="item-description">(FILÉ DE FRANGO, CONTRA-FILÉ, LINGUIÇA ACEBOLADA)</p>
+                    <div class="item-details"><span class="item-name">MISTA DE CARNES</span></div>
+                    <p class="item-description">(FILÉ DE FRANGO, CONTRA-FILÉ, LINGUIÇA ACEBOLADA)</p>
                     <div class="portion-buttons">
-                        <button class="add-to-cart-btn portion-btn" data-name="Mista de Carnes (Meia)" data-price="35.00">Meia <br> R$ 35,00</button>
-                        <button class="add-to-cart-btn portion-btn" data-name="Mista de Carnes (Inteira)" data-price="50.00">Inteira <br> R$ 50,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Mista de Carnes (Meia)"
+                            data-price="35.00">Meia <br> R$ 35,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Mista de Carnes (Inteira)"
+                            data-price="50.00">Inteira <br> R$ 50,00</button>
                     </div>
                 </div>
                 <div class="menu-card fade-in">
-                     <div class="item-details"><span class="item-name">MISTA DE FRIOS</span></div>
+                    <div class="item-details"><span class="item-name">MISTA DE FRIOS</span></div>
                     <div class="portion-buttons">
-                        <button class="add-to-cart-btn portion-btn" data-name="Mista de Frios (Meia)" data-price="35.00">Meia <br> R$ 35,00</button>
-                        <button class="add-to-cart-btn portion-btn" data-name="Mista de Frios (Inteira)" data-price="50.00">Inteira <br> R$ 50,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Mista de Frios (Meia)"
+                            data-price="35.00">Meia <br> R$ 35,00</button>
+                        <button class="add-to-cart-btn portion-btn" data-name="Mista de Frios (Inteira)"
+                            data-price="50.00">Inteira <br> R$ 50,00</button>
                     </div>
                 </div>
             </div>
@@ -244,46 +310,181 @@
         <section id="adicionais">
             <h2 class="fade-in">✨ Adicionais</h2>
             <div class="menu-grid">
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">MUÇARELA</span><span class="item-price">R$ 8,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Muçarela" data-price="8.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">CATUPIRY</span><span class="item-price">R$ 8,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Catupiry" data-price="8.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">CHEDDAR</span><span class="item-price">R$ 8,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Cheddar" data-price="8.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">BACON</span><span class="item-price">R$ 8,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Bacon" data-price="8.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">HAMBURGUER</span><span class="item-price">R$ 8,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Hamburguer" data-price="8.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">CALABRESA</span><span class="item-price">R$ 6,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Calabresa" data-price="6.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">PRESUNTO</span><span class="item-price">R$ 6,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Presunto" data-price="6.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">MILHO</span><span class="item-price">R$ 4,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Milho" data-price="4.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">TOMATE/ALFACE</span><span class="item-price">R$ 3,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Tomate/Alface" data-price="3.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">OVO</span><span class="item-price">R$ 3,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Ovo" data-price="3.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">SALSICHA</span><span class="item-price">R$ 3,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Salsicha" data-price="3.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">LANCHE NO PRATO</span><span class="item-price">R$ 5,00</span></div><button class="add-to-cart-btn" data-name="Serviço - Lanche no Prato" data-price="5.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">SACHES HEINZ (UNIDADE)</span><span class="item-price">R$ 0,30</span></div><button class="add-to-cart-btn" data-name="Sache Heinz" data-price="0.30">+</button></div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">MUÇARELA</span><span class="item-price">R$
+                            8,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Muçarela"
+                        data-price="8.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">CATUPIRY</span><span class="item-price">R$
+                            8,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Catupiry"
+                        data-price="8.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">CHEDDAR</span><span class="item-price">R$
+                            8,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Cheddar"
+                        data-price="8.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">BACON</span><span class="item-price">R$
+                            8,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Bacon"
+                        data-price="8.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">HAMBURGUER</span><span class="item-price">R$
+                            8,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Hamburguer"
+                        data-price="8.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">CALABRESA</span><span class="item-price">R$
+                            6,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Calabresa"
+                        data-price="6.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">PRESUNTO</span><span class="item-price">R$
+                            6,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Presunto"
+                        data-price="6.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">MILHO</span><span class="item-price">R$
+                            4,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Milho"
+                        data-price="4.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">TOMATE/ALFACE</span><span class="item-price">R$
+                            3,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Tomate/Alface"
+                        data-price="3.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">OVO</span><span class="item-price">R$ 3,00</span>
+                    </div><button class="add-to-cart-btn" data-name="Adicional - Ovo" data-price="3.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">SALSICHA</span><span class="item-price">R$
+                            3,00</span></div><button class="add-to-cart-btn" data-name="Adicional - Salsicha"
+                        data-price="3.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">LANCHE NO PRATO</span><span class="item-price">R$
+                            5,00</span></div><button class="add-to-cart-btn" data-name="Serviço - Lanche no Prato"
+                        data-price="5.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">SACHES HEINZ (UNIDADE)</span><span
+                            class="item-price">R$ 0,30</span></div><button class="add-to-cart-btn"
+                        data-name="Sache Heinz" data-price="0.30">+</button>
+                </div>
             </div>
         </section>
 
         <section id="bebidas">
             <h2 class="fade-in">🥤 Bebidas</h2>
             <div class="menu-grid">
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">CERVEJA SKOL LATA 350ML</span><span class="item-price">R$ 6,00</span></div><button class="add-to-cart-btn" data-name="Cerveja Skol Lata" data-price="6.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">CERVEJA HEINEKEN 330 ML</span><span class="item-price">R$ 10,00</span></div><button class="add-to-cart-btn" data-name="Cerveja Heineken 330ml" data-price="10.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">REFRIGERANTE LATA</span><span class="item-price">R$ 6,00</span></div><button class="add-to-cart-btn" data-name="Refrigerante Lata" data-price="6.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">ÁGUA</span><span class="item-price">R$ 3,00</span></div><button class="add-to-cart-btn" data-name="Água sem Gás" data-price="3.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">CERVEJA ANTARTICA GARRAFA 600 ML</span><span class="item-price">R$ 12,00</span></div><button class="add-to-cart-btn" data-name="Cerveja Antartica 600ml" data-price="12.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">CERVEJA SKOL GARRAFA 600 ML</span><span class="item-price">R$ 12,00</span></div><button class="add-to-cart-btn" data-name="Cerveja Skol 600ml" data-price="12.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">CERVEJA MALZBIER LONG NECK</span><span class="item-price">R$ 10,00</span></div><button class="add-to-cart-btn" data-name="Cerveja Malzbier Long Neck" data-price="10.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">CHOPE DE VINHO LATA 550 ML</span><span class="item-price">R$ 12,00</span></div><button class="add-to-cart-btn" data-name="Chope de Vinho Lata" data-price="12.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">ENERGÉTICO MONSTER 473 ML</span><span class="item-price">R$ 15,00</span></div><button class="add-to-cart-btn" data-name="Energético Monster" data-price="15.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">REFRIGERANTE 2L</span><span class="item-price">R$ 15,00</span></div> <p class="item-description">(COCA COLA, FANTA, SPRITE, GUARANÁ ANTÁRTICA)</p><button class="add-to-cart-btn" data-name="Refrigerante 2L (Linha Coca)" data-price="15.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">REFRIGERANTE POTY 2L</span><span class="item-price">R$ 10,00</span></div><button class="add-to-cart-btn" data-name="Refrigerante Poty 2L" data-price="10.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">SUCO DEL VALE LATA</span><span class="item-price">R$ 7,00</span></div><button class="add-to-cart-btn" data-name="Suco Del Vale Lata" data-price="7.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">ÁGUA COM GÁS</span><span class="item-price">R$ 4,00</span></div><button class="add-to-cart-btn" data-name="Água com Gás" data-price="4.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">ÁGUA TONICA</span><span class="item-price">R$ 6,00</span></div><button class="add-to-cart-btn" data-name="Água Tônica" data-price="6.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">COCA-COLA 1L</span><span class="item-price">R$ 10,00</span></div><button class="add-to-cart-btn" data-name="Coca-Cola 1L" data-price="10.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">GUARANÁ 1L</span><span class="item-price">R$ 8,00</span></div><button class="add-to-cart-btn" data-name="Guaraná 1L" data-price="8.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">REFRIGERANTE 600ML</span><span class="item-price">R$ 8,00</span></div><button class="add-to-cart-btn" data-name="Refrigerante 600ml" data-price="8.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">COCA-COLA 290ML (KS)</span><span class="item-price">R$ 5,00</span></div><button class="add-to-cart-btn" data-name="Coca-Cola 290ml (KS)" data-price="5.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">COCA-COLA ZERO LATA</span><span class="item-price">R$ 6,00</span></div><button class="add-to-cart-btn" data-name="Coca-Cola Zero Lata" data-price="6.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">SUCO NATURAL LARANJA 500ML</span><span class="item-price">R$ 10,00</span></div><button class="add-to-cart-btn" data-name="Suco Natural Laranja 500ml" data-price="10.00">+</button></div>
-                <div class="menu-card fade-in"><div class="item-details"><span class="item-name">SUCO NATURAL LARANJA 1L</span><span class="item-price">R$ 20,00</span></div><button class="add-to-cart-btn" data-name="Suco Natural Laranja 1L" data-price="20.00">+</button></div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">CERVEJA SKOL LATA 350ML</span><span
+                            class="item-price">R$ 6,00</span></div><button class="add-to-cart-btn"
+                        data-name="Cerveja Skol Lata" data-price="6.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">CERVEJA HEINEKEN 330 ML</span><span
+                            class="item-price">R$ 10,00</span></div><button class="add-to-cart-btn"
+                        data-name="Cerveja Heineken 330ml" data-price="10.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">REFRIGERANTE LATA</span><span
+                            class="item-price">R$ 6,00</span></div><button class="add-to-cart-btn"
+                        data-name="Refrigerante Lata" data-price="6.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">ÁGUA</span><span class="item-price">R$ 3,00</span>
+                    </div><button class="add-to-cart-btn" data-name="Água sem Gás" data-price="3.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">CERVEJA ANTARTICA GARRAFA 600 ML</span><span
+                            class="item-price">R$ 12,00</span></div><button class="add-to-cart-btn"
+                        data-name="Cerveja Antartica 600ml" data-price="12.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">CERVEJA SKOL GARRAFA 600 ML</span><span
+                            class="item-price">R$ 12,00</span></div><button class="add-to-cart-btn"
+                        data-name="Cerveja Skol 600ml" data-price="12.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">CERVEJA MALZBIER LONG NECK</span><span
+                            class="item-price">R$ 10,00</span></div><button class="add-to-cart-btn"
+                        data-name="Cerveja Malzbier Long Neck" data-price="10.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">CHOPE DE VINHO LATA 550 ML</span><span
+                            class="item-price">R$ 12,00</span></div><button class="add-to-cart-btn"
+                        data-name="Chope de Vinho Lata" data-price="12.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">ENERGÉTICO MONSTER 473 ML</span><span
+                            class="item-price">R$ 15,00</span></div><button class="add-to-cart-btn"
+                        data-name="Energético Monster" data-price="15.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">REFRIGERANTE 2L</span><span class="item-price">R$
+                            15,00</span></div>
+                    <p class="item-description">(COCA COLA, FANTA, SPRITE, GUARANÁ ANTÁRTICA)</p><button
+                        class="add-to-cart-btn" data-name="Refrigerante 2L (Linha Coca)" data-price="15.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">REFRIGERANTE POTY 2L</span><span
+                            class="item-price">R$ 10,00</span></div><button class="add-to-cart-btn"
+                        data-name="Refrigerante Poty 2L" data-price="10.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">SUCO DEL VALE LATA</span><span
+                            class="item-price">R$ 7,00</span></div><button class="add-to-cart-btn"
+                        data-name="Suco Del Vale Lata" data-price="7.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">ÁGUA COM GÁS</span><span class="item-price">R$
+                            4,00</span></div><button class="add-to-cart-btn" data-name="Água com Gás"
+                        data-price="4.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">ÁGUA TONICA</span><span class="item-price">R$
+                            6,00</span></div><button class="add-to-cart-btn" data-name="Água Tônica"
+                        data-price="6.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">COCA-COLA 1L</span><span class="item-price">R$
+                            10,00</span></div><button class="add-to-cart-btn" data-name="Coca-Cola 1L"
+                        data-price="10.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">GUARANÁ 1L</span><span class="item-price">R$
+                            8,00</span></div><button class="add-to-cart-btn" data-name="Guaraná 1L"
+                        data-price="8.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">REFRIGERANTE 600ML</span><span
+                            class="item-price">R$ 8,00</span></div><button class="add-to-cart-btn"
+                        data-name="Refrigerante 600ml" data-price="8.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">COCA-COLA 290ML (KS)</span><span
+                            class="item-price">R$ 5,00</span></div><button class="add-to-cart-btn"
+                        data-name="Coca-Cola 290ml (KS)" data-price="5.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">COCA-COLA ZERO LATA</span><span
+                            class="item-price">R$ 6,00</span></div><button class="add-to-cart-btn"
+                        data-name="Coca-Cola Zero Lata" data-price="6.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">SUCO NATURAL LARANJA 500ML</span><span
+                            class="item-price">R$ 10,00</span></div><button class="add-to-cart-btn"
+                        data-name="Suco Natural Laranja 500ml" data-price="10.00">+</button>
+                </div>
+                <div class="menu-card fade-in">
+                    <div class="item-details"><span class="item-name">SUCO NATURAL LARANJA 1L</span><span
+                            class="item-price">R$ 20,00</span></div><button class="add-to-cart-btn"
+                        data-name="Suco Natural Laranja 1L" data-price="20.00">+</button>
+                </div>
             </div>
         </section>
 
@@ -317,7 +518,8 @@
                     <option value="Entrega">Entrega</option>
                     <option value="Retirada">Retirada no Local</option>
                 </select>
-                <input type="text" id="customer-address" placeholder="Seu Endereço (Rua, N°, Bairro)" class="hidden" required>
+                <input type="text" id="customer-address" placeholder="Seu Endereço (Rua, N°, Bairro)" class="hidden"
+                    required>
                 <select id="payment-method" required>
                     <option value="">Forma de Pagamento</option>
                     <option value="Dinheiro">Dinheiro</option>
@@ -325,7 +527,8 @@
                     <option value="Cartão de Débito">Cartão de Débito</option>
                     <option value="Pix">Pix</option>
                 </select>
-                <textarea id="order-notes" placeholder="Observações (ex: tirar cebola, troco para R$50, etc)"></textarea>
+                <textarea id="order-notes"
+                    placeholder="Observações (ex: tirar cebola, troco para R$50, etc)"></textarea>
             </div>
             <button id="finalize-order-btn" class="finalize-order-btn">Enviar Pedido via WhatsApp</button>
         </div>
@@ -339,5 +542,5 @@
 
     <script type="module" src="script.js"></script>
 </body>
-</html>
 
+</html>
