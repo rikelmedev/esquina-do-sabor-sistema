@@ -19,7 +19,7 @@ body {
     color: var(--text-light);
     line-height: 1.6;
     position: relative;
-    padding-bottom: 30px; /* Ajuste para desktop */
+    padding-bottom: 30px; 
 }
 
 .container {
@@ -185,7 +185,6 @@ nav {
 /* =========================================================
    4. CARRINHO FLUTUANTE (DESKTOP) & BARRA (MOBILE)
    ========================================================= */
-/* Bolinha de Carrinho (Mostra no PC) */
 .cart-fab {
     position: fixed;
     bottom: 30px;
@@ -235,7 +234,7 @@ footer { background-color: var(--header-dark); color: var(--text-secondary); tex
    6. RESPONSIVIDADE (MOBILE APP STYLE - SÓ PARA TELEMÓVEL)
    ========================================================= */
 @media (max-width: 768px) {
-    body { padding-bottom: 100px; } /* Espaço para a barra na base */
+    body { padding-bottom: 100px; } 
 
     /* Cabeçalho Compacto */
     .header-logo, .header-mascot { display: none; }
@@ -280,7 +279,7 @@ footer { background-color: var(--header-dark); color: var(--text-secondary); tex
         border-radius: 12px;
         background: #1a1a1a;
         border: 1px solid #333;
-        border-left: 1px solid #333; /* Remove a borda amarela lateral */
+        border-left: 1px solid #333; 
         text-align: left;
         min-height: 110px; 
         position: relative;
@@ -299,10 +298,10 @@ footer { background-color: var(--header-dark); color: var(--text-secondary); tex
     }
 
     /* Troca de Carrinhos */
-    .cart-fab { display: none !important; } /* Esconde bolinha no telemóvel */
+    .cart-fab { display: none !important; } 
     
     .bottom-cart-bar {
-        display: flex !important; /* Mostra a barra no telemóvel */
+        display: flex !important; 
         position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
         width: 92%; max-width: 450px; background-color: var(--color-red-fire); color: white;
         border-radius: 12px; justify-content: space-between; align-items: center;

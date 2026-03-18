@@ -154,3 +154,26 @@ document.getElementById('finalize-order-btn').addEventListener('click', async ()
         alert("Erro ao enviar. Verifique sua conexão.");
     }
 });
+
+// 4. MENU INTELIGENTE (SCROLL SPY)
+const sections = document.querySelectorAll('section');
+const navLinks = document.querySelectorAll('.nav-list li a');
+
+window.addEventListener('scroll', () => {
+    let current = '';
+    
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        if (pageYOffset >= (sectionTop - 150)) { 
+            current = section.getAttribute('id');
+        }
+    });
+
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').includes(current)) {
+            link.classList.add('active');
+        }
+    });
+});
