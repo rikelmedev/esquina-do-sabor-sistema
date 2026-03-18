@@ -106,8 +106,8 @@
                 </div>
 
                 <label>Lançar Novo Produto</label>
-                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                    <select id="select-produto" style="margin-bottom: 0;">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <select id="select-produto" style="margin-bottom: 0; flex: 1;">
                         <option value="">Escolha um produto...</option>
                         <optgroup label="🍔 LANCHES">
                             <option value="19.00">X-Burguer</option>
@@ -118,7 +118,18 @@
                             <option value="10.00">Heineken</option>
                         </optgroup>
                     </select>
-                    <button class="btn-primary" style="width: auto; padding: 0 25px; margin-bottom: 0;" onclick="adicionarItemGarcom()">+</button>
+                    
+                    <input type="number" id="qtd-garcom" value="1" min="1" style="width: 70px; margin-bottom: 0; padding: 15px; text-align: center;">
+                    
+                    <button class="btn-primary" style="width: auto; padding: 0 20px; margin-bottom: 0;" onclick="adicionarAoCarrinhoGarcom()">+</button>
+                </div>
+                
+                <input type="text" id="obs-garcom" placeholder="Observações (Ex: Sem cebola)..." style="padding: 12px; font-size: 0.9rem; margin-bottom: 20px; width: 100%; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 12px;">
+
+                <div id="area-carrinho-garcom" style="display: none; background: rgba(59, 130, 246, 0.1); border: 1px dashed #3b82f6; border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+                    <div style="color: #3b82f6; font-size: 0.85rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase;">🛒 Enviar para a Cozinha:</div>
+                    <div id="lista-carrinho-garcom" style="margin-bottom: 15px;"></div>
+                    <button class="btn-success" onclick="enviarPedidoGarcom()" style="margin-bottom: 0;">👨‍🍳 Confirmar e Enviar</button>
                 </div>
 
                 <button class="btn-danger" onclick="fecharContaGarcom()">🧾 Solicitar Fechamento de Conta</button>

@@ -34,8 +34,9 @@ const clientAddress = document.getElementById('customer-address');
 const paymentMethod = document.getElementById('payment-method');
 const orderObservations = document.getElementById('order-notes');
 
-// Abrir e fechar modal
-document.getElementById('cart-fab').addEventListener('click', () => {
+// BARRA INFERIOR 
+const bottomCartBar = document.getElementById('bottom-cart-bar');
+bottomCartBar.addEventListener('click', () => {
     cartModal.style.display = 'block';
 });
 
@@ -76,8 +77,19 @@ function updateCart() {
         `;
         cartItemsContainer.appendChild(div);
     });
-    cartTotalValue.innerText = total.toFixed(2).replace('.', ',');
-    document.getElementById('cart-count').innerText = cart.length;
+    
+    const formatTotal = total.toFixed(2).replace('.', ',');
+    cartTotalValue.innerText = formatTotal;
+    
+    const count = cart.length;
+    document.getElementById('cart-count-bottom').innerText = count;
+    document.getElementById('cart-total-bottom').innerText = formatTotal;
+    
+    if (count > 0) {
+        bottomCartBar.classList.remove('hidden');
+    } else {
+        bottomCartBar.classList.add('hidden');
+    }
 }
 
 window.removeItem = (index) => {

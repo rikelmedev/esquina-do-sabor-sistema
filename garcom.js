@@ -15,6 +15,7 @@ const db = getFirestore(app);
 
 const mesaGrid = document.getElementById('mesa-grid');
 let mesaAtualId = null;
+let carrinhoGarcom = []; // Memória temporária do pedido atual
 
 // ESCUTAR STATUS DAS MESAS
 onSnapshot(collection(db, "mesas"), (snapshot) => {
@@ -40,6 +41,11 @@ function renderMesa(id, mesa) {
 // ABRIR GESTÃO DA MESA NO MODAL
 window.abrirMesa = (id, mesa) => {
     mesaAtualId = id;
+    
+    // Zera o carrinho temporário sempre que abrir uma mesa
+    carrinhoGarcom = [];
+    atualizarCarrinhoGarcomUI();
+    
     document.getElementById('modal-titulo-mesa').innerText = `MESA ${mesa.numero}`;
     
     const areaLivre = document.getElementById('area-livre');
@@ -85,39 +91,111 @@ window.ocuparMesaGarcom = async () => {
     } catch (e) { console.error(e); }
 };
 
-// LANÇAR ITEM (ATUALIZADO)
-window.adicionarItemGarcom = async () => {
+// ==========================================
+// MÓDULO DE CARRINHO DO GARÇOM (LOTE)
+// ==========================================
+
+window.adicionarAoCarrinhoGarcom = () => {
     const select = document.getElementById('select-produto');
+    const inputObs = document.getElementById('obs-garcom');
+    const inputQtd = document.getElementById('qtd-garcom');
+    
     const valor = parseFloat(select.value);
     const texto = select.options[select.selectedIndex].text;
+    const observacao = inputObs ? inputObs.value.trim() : "";
+    const qtd = parseInt(inputQtd ? inputQtd.value : 1) || 1;
     
     if (!valor) return alert("Selecione um produto para lançar!");
+
+    for(let i = 0; i < qtd; i++) {
+        const nomeFinal = observacao ? `${texto} (${observacao})` : texto;
+        carrinhoGarcom.push({ nome: nomeFinal, preco: valor, name: nomeFinal, price: valor });
+    }
+
+    atualizarCarrinhoGarcomUI();
+    
+    // Reseta os campos para o próximo item
+    select.selectedIndex = 0;
+    if(inputObs) inputObs.value = "";
+    if(inputQtd) inputQtd.value = "1";
+};
+
+window.atualizarCarrinhoGarcomUI = () => {
+    const areaCarrinho = document.getElementById('area-carrinho-garcom');
+    const lista = document.getElementById('lista-carrinho-garcom');
+    
+    if (!areaCarrinho || !lista) return;
+
+    if (carrinhoGarcom.length === 0) {
+        areaCarrinho.style.display = 'none';
+        return;
+    }
+
+    areaCarrinho.style.display = 'block';
+    lista.innerHTML = "";
+    carrinhoGarcom.forEach((item, index) => {
+        lista.innerHTML += `
+            <div class="item-row" style="padding: 5px 0; border-bottom: 1px solid rgba(59, 130, 246, 0.2);">
+                <span class="item-name" style="color: #60a5fa; font-size: 0.85rem;">• ${item.nome}</span>
+                <button class="btn-remove-item" style="padding: 4px 8px; font-size: 0.8rem; background: transparent; border: 1px solid #ef4444;" onclick="removerDoCarrinhoGarcom(${index})">X</button>
+            </div>
+        `;
+    });
+};
+
+window.removerDoCarrinhoGarcom = (index) => {
+    carrinhoGarcom.splice(index, 1);
+    atualizarCarrinhoGarcomUI();
+};
+
+window.enviarPedidoGarcom = async () => {
+    if (carrinhoGarcom.length === 0) return alert("O carrinho está vazio!");
 
     const mesaRef = doc(db, "mesas", mesaAtualId);
     try {
         const snap = await getDoc(mesaRef);
         const dados = snap.data();
         
-        const novoItem = { nome: texto, preco: valor };
+        let totalCarrinho = 0;
+        let itensParaOFront = [];
+        let itensParaOCanban = [];
+
+        // Prepara os dados para enviar ao banco
+        carrinhoGarcom.forEach(item => {
+            totalCarrinho += item.preco;
+            itensParaOFront.push({ nome: item.nome, preco: item.preco });
+            itensParaOCanban.push({ name: item.name, price: item.price });
+        });
         
+        // 1. Atualiza o financeiro e a conta da mesa
         await updateDoc(mesaRef, {
-            total: (dados.total || 0) + valor,
-            itens: [...(dados.itens || []), novoItem] 
+            total: (dados.total || 0) + totalCarrinho,
+            itens: [...(dados.itens || []), ...itensParaOFront] 
         });
 
-        // Manda o pedido para a cozinha (Preparando)
+        // 2. Manda TUDO consolidado para a cozinha (Preparando)
         await addDoc(collection(db, "pedidos"), {
-            cliente: `MESA ${dados.numero}`, status: "Preparando", data: serverTimestamp(),
-            total: 0, itens: [{ name: texto, price: 0 }], metodo: "Consumo na Mesa", pagamento: "Comanda Cozinha"
+            cliente: `MESA ${dados.numero}`, 
+            status: "Preparando", 
+            data: serverTimestamp(),
+            total: 0, 
+            itens: itensParaOCanban, 
+            metodo: "Consumo na Mesa", 
+            pagamento: "Comanda Cozinha"
         });
 
-        select.selectedIndex = 0;
+        // Limpa tudo e fecha
+        carrinhoGarcom = [];
+        atualizarCarrinhoGarcomUI();
         fecharModal();
-        alert("Item enviado para a cozinha!");
+        alert("Pedido completo enviado para a cozinha com sucesso!");
+        
     } catch (e) { console.error(e); }
 };
 
-// EXCLUIR ITEM ESPECÍFICO 
+// ==========================================
+
+// EXCLUIR ITEM ESPECÍFICO DA MESA (DEPOIS DE LANÇADO)
 window.removerItemGarcom = async (index, precoAAbater) => {
     if(!confirm("Tem certeza que deseja remover este item da conta da mesa?")) return;
     

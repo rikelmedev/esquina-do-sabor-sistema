@@ -24,17 +24,15 @@
             <img src="Imagens/Mascote.png" alt="Mascote Esquina do Sabor" class="header-mascot">
         </div>
     </header>
-    <nav>
-        
-        <div class="container">
-            <ul>
-                <li><a href="#lanches">Lanches</a></li>
-                <li><a href="#hotdogs">Hot Dog's</a></li>
-                <li><a href="#porcoes">Porções</a></li>
-                <li><a href="#adicionais">Adicionais</a></li>
-                <li><a href="#bebidas">Bebidas</a></li>
-            </ul>
-        </div>
+    
+    <nav class="category-nav">
+        <ul class="nav-list">
+            <li><a href="#lanches" class="active">🍔 Lanches</a></li>
+            <li><a href="#hotdogs">🌭 Hot Dog's</a></li>
+            <li><a href="#porcoes">🍟 Porções</a></li>
+            <li><a href="#adicionais">✨ Adicionais</a></li>
+            <li><a href="#bebidas">🥤 Bebidas</a></li>
+        </ul>
     </nav>
 
     <main class="container">
@@ -291,10 +289,14 @@
 
     </main>
 
-    <!-- Carrinho de Compras Flutuante -->
-    <div id="cart-fab" class="cart-fab">
-        🛒
-        <span id="cart-count" class="cart-count">0</span>
+    <div id="bottom-cart-bar" class="bottom-cart-bar hidden">
+        <div class="cart-info">
+            <span id="cart-count-bottom" class="cart-badge">0</span>
+            <span class="cart-text">Ver sacola</span>
+        </div>
+        <div class="cart-price">
+            R$ <span id="cart-total-bottom">0,00</span>
+        </div>
     </div>
 
     <!-- Modal do Pedido -->
