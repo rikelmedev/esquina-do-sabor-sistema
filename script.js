@@ -13,7 +13,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-
 // 1. ANIMAÇÃO
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -34,11 +33,19 @@ const clientAddress = document.getElementById('customer-address');
 const paymentMethod = document.getElementById('payment-method');
 const orderObservations = document.getElementById('order-notes');
 
-// BARRA INFERIOR 
+// --- SINCRONIZAÇÃO DOS DOIS BOTÕES DE CARRINHO (PC E MOBILE) ---
+
+// Botão Mobile (Barra Inferior)
 const bottomCartBar = document.getElementById('bottom-cart-bar');
-bottomCartBar.addEventListener('click', () => {
-    cartModal.style.display = 'block';
-});
+if (bottomCartBar) {
+    bottomCartBar.addEventListener('click', () => cartModal.style.display = 'block');
+}
+
+// Botão PC (Bolinha Flutuante)
+const cartFab = document.getElementById('cart-fab');
+if (cartFab) {
+    cartFab.addEventListener('click', () => cartModal.style.display = 'block');
+}
 
 document.querySelector('.close-button').addEventListener('click', () => {
     cartModal.style.display = 'none';
@@ -82,9 +89,19 @@ function updateCart() {
     cartTotalValue.innerText = formatTotal;
     
     const count = cart.length;
-    document.getElementById('cart-count-bottom').innerText = count;
-    document.getElementById('cart-total-bottom').innerText = formatTotal;
     
+    // Atualiza a Barra Mobile
+    if (document.getElementById('cart-count-bottom')) {
+        document.getElementById('cart-count-bottom').innerText = count;
+        document.getElementById('cart-total-bottom').innerText = formatTotal;
+    }
+    
+    // Atualiza a Bolinha do PC
+    if (document.getElementById('cart-count')) {
+        document.getElementById('cart-count').innerText = count;
+    }
+    
+    // Mostra ou esconde a barra no Mobile
     if (count > 0) {
         bottomCartBar.classList.remove('hidden');
     } else {
