@@ -432,49 +432,57 @@ footer {
         padding-bottom: 100px; 
     }
 
-    /* Cabeçalho Identidade Visual (Mobile) - CORRIGIDO */
+    /* Cabeçalho Identidade Visual (Mobile) */
     .header { 
         display: block; 
-        padding: 25px 0 15px 0; 
+        padding: 20px 0 10px 0; 
     }
     
     .header-container { 
-        display: grid; 
-        grid-template-columns: auto auto; 
+        display: flex; 
+        flex-wrap: wrap; 
         justify-content: space-between; 
         align-items: center; 
-        gap: 15px;
         padding: 0 20px;
     }
     
-    .header-logo, 
+    .header-logo { 
+        display: block !important; 
+        order: 1; 
+        height: 75px; 
+        width: auto; 
+    }
+    
     .header-mascot { 
         display: block !important; 
-        height: 85px; 
+        order: 2; 
+        height: 75px; 
         width: auto; 
     }
     
     .header-text { 
-        grid-column: span 2; 
+        order: 3;
+        width: 100%; 
         text-align: center; 
+        margin-top: 15px; 
     }
     
     .header h1 { 
-        font-size: 2.6rem; 
+        font-size: 2rem; 
         margin: 0; 
+        line-height: 1.1;
     }
     
     .header .slogan { 
-        font-size: 1.1rem; 
-        margin-top: 5px; 
-        margin-bottom: 10px; 
+        font-size: 1rem; 
+        margin-top: 2px; 
+        margin-bottom: 8px; 
     }
     
     .header .contact-info p { 
-        font-size: 0.9rem; 
+        font-size: 0.8rem; 
         margin-bottom: 4px; 
     }
-
     /* Barra Fixa Mobile (Hambúrguer) */
     .mobile-header-bar {
         display: flex;
