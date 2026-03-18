@@ -286,10 +286,25 @@ window.calcularTotaisMesa = () => {
 
 window.renderMesaAdmin = (id, mesa) => {
     const div = document.createElement('div');
-    const corBorda = mesa.status === 'ocupada' ? '#ef4444' : '#10b981';
-    const corFundo = mesa.status === 'ocupada' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
+    
+    // LÓGICA DE CORES (Verde=Livre, Vermelho=Ocupada, Amarelo=Fechando)
+    let corBorda = '#10b981'; 
+    let corFundo = 'rgba(16, 185, 129, 0.1)';
+    let textoStatus = mesa.status;
+
+    if (mesa.status === 'ocupada') {
+        corBorda = '#ef4444';
+        corFundo = 'rgba(239, 68, 68, 0.1)';
+    } else if (mesa.status === 'fechando') {
+        corBorda = '#f59e0b'; // Amarelo
+        corFundo = 'rgba(245, 158, 11, 0.2)';
+        textoStatus = 'AGUARDANDO PAGTO'; 
+    }
+    
     div.style.cssText = `background: ${corFundo}; border: 2px solid ${corBorda}; border-radius: 12px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #f8fafc; cursor: pointer; transition: transform 0.2s;`;
-    div.innerHTML = `<span style="font-size: 1.5rem; font-weight: bold;">MESA ${mesa.numero}</span><span style="font-size: 0.8rem; text-transform: uppercase; color: ${corBorda};">${mesa.status}</span>${mesa.status === 'ocupada' ? `<span style="color: #f59e0b; margin-top: 5px; font-weight: bold;">R$ ${(mesa.total || 0).toFixed(2).replace('.', ',')}</span>` : ''}`;
+    
+    div.innerHTML = `<span style="font-size: 1.5rem; font-weight: bold;">MESA ${mesa.numero}</span><span style="font-size: 0.8rem; text-transform: uppercase; color: ${corBorda}; font-weight: bold; text-align: center;">${textoStatus}</span>${(mesa.status === 'ocupada' || mesa.status === 'fechando') ? `<span style="color: #f59e0b; margin-top: 5px; font-weight: bold;">R$ ${(mesa.total || 0).toFixed(2).replace('.', ',')}</span>` : ''}`;
+    
     div.onclick = () => abrirMesaAdmin(id, mesa);
     const grid = document.getElementById('mesa-grid-admin');
     if (grid) grid.appendChild(div);

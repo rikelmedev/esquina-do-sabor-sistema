@@ -140,19 +140,17 @@ window.removerItemGarcom = async (index, precoAAbater) => {
     } catch (e) { console.error(e); }
 };
 
-// FECHAR CONTA (O garçom não recebe o dinheiro, só zera a mesa)
+// FECHAR CONTA (Trava de Segurança: Altera para fechando)
 window.fecharContaGarcom = async () => {
-    if (!confirm("Deseja enviar o fechamento desta conta para o Caixa? O cliente irá pagar agora.")) return;
+    if (!confirm("Avisar o Caixa que esta mesa pediu a conta?")) return;
     
     const mesaRef = doc(db, "mesas", mesaAtualId);
     try {
         await updateDoc(mesaRef, {
-            status: "livre",
-            total: 0,
-            itens: []
+            status: "fechando"
         });
         fecharModal();
-        alert("Mesa liberada! Avise o caixa para receber o pagamento.");
+        alert("Caixa avisado! Aguarde a impressão da conta.");
     } catch (e) { console.error(e); }
 };
 
