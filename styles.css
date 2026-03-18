@@ -7,640 +7,133 @@
     --header-dark: #111111;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Roboto', sans-serif; background-color: var(--background-dark); color: var(--text-light); line-height: 1.6; position: relative; padding-bottom: 30px; }
+.container { max-width: 1200px; margin: auto; padding: 0 20px; }
+h1, h2, h3 { font-family: 'Teko', sans-serif; font-weight: 700; text-transform: uppercase; }
+h2 { text-align: center; color: var(--color-yellow-flame); font-size: 3.5rem; margin-bottom: 2rem; letter-spacing: 1px; }
+section { padding: 60px 0; }
 
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: var(--background-dark);
-    color: var(--text-light);
-    line-height: 1.6;
-    position: relative;
-    padding-bottom: 30px;
-}
+/* 1. CABEÇALHO (DESKTOP) */
+.header { background: var(--header-dark); padding: 20px 0; position: relative; overflow: hidden; }
+.header-container { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 0 40px; }
+.header-logo, .header-mascot { height: 120px; width: auto; flex-shrink: 0; }
+.header-text { text-align: center; flex-grow: 1; }
+.header h1 { color: var(--color-red-fire); font-size: 3.5rem; line-height: 1; margin: 0; }
+.header .slogan { font-size: 1.3rem; color: var(--text-secondary); font-family: 'Teko', sans-serif; text-transform: uppercase; }
+.header .contact-info { margin-top: 1rem; font-size: 1rem; }
+.header .contact-info p { margin-bottom: 0.25rem; }
 
-.container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 0 20px;
-}
+.mobile-header-bar { display: none; }
+.close-sidebar { display: none; }
 
-h1,
-h2,
-h3 {
-    font-family: 'Teko', sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
-}
+/* 2. NAVEGAÇÃO CLÁSSICA (DESKTOP) */
+nav { background-color: #222; position: sticky; top: 0; z-index: 1000; border-bottom: 3px solid var(--color-red-fire); }
+.nav-list { list-style: none; display: flex; justify-content: center; flex-wrap: wrap; }
+.nav-list li a { display: block; color: var(--text-light); text-decoration: none; padding: 15px 20px; font-weight: 700; text-transform: uppercase; transition: background-color 0.3s, color 0.3s; border-radius: 0; border: none; }
+.nav-list li a:hover, .nav-list li a.active { background-color: var(--color-yellow-flame); color: var(--background-dark); }
 
-h2 {
-    text-align: center;
-    color: var(--color-yellow-flame);
-    font-size: 3.5rem;
-    margin-bottom: 2rem;
-    letter-spacing: 1px;
-}
+/* 3. CARTÕES DE PRODUTO (DESKTOP GRID) */
+.menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+.menu-card { background-color: #2c2c2c; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.3s, box-shadow 0.3s; border-left: 5px solid transparent; }
+.menu-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); border-left-color: var(--color-yellow-flame); }
+.item-details { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
+.item-name { font-size: 1.1rem; font-weight: 700; color: var(--text-light); }
+.item-price { font-size: 1.1rem; font-weight: 700; color: var(--color-yellow-flame); white-space: nowrap; }
+.item-description { font-size: 0.85rem; color: var(--text-secondary); font-style: italic; margin-top: 5px; margin-bottom: 15px; flex-grow: 1; }
+.add-to-cart-btn { background-color: var(--color-yellow-flame); color: var(--background-dark); border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 22px; font-weight: bold; cursor: pointer; transition: background-color 0.3s, transform 0.2s; align-self: flex-end; margin-top: auto; }
+.add-to-cart-btn:hover { background-color: #ffdb58; transform: scale(1.1); }
+.portion-buttons { display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end; }
+.portion-btn { border-radius: 8px; padding: 8px 12px; font-size: 14px; text-align: center; }
 
-section {
-    padding: 60px 0;
-}
+/* 4. CARRINHO FLUTUANTE (DESKTOP) & BARRA (MOBILE) */
+.cart-fab { position: fixed; bottom: 30px; right: 30px; background-color: var(--color-red-fire); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 1000; transition: transform 0.2s; }
+.cart-fab:hover { transform: scale(1.1); }
+.cart-count { position: absolute; top: -5px; right: -5px; background-color: var(--color-yellow-flame); color: var(--background-dark); font-size: 14px; font-weight: bold; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.bottom-cart-bar { display: none !important; }
 
-.mobile-header-bar {
-    display: none;
-}
-
-.close-sidebar {
-    display: none;
-}
-
-
-/* =========================================================
-   1. CABEÇALHO (DESKTOP)
-   ========================================================= */
-.header {
-    background: var(--header-dark);
-    padding: 20px 0;
-    position: relative;
-    overflow: hidden;
-}
-
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    padding: 0 40px;
-}
-
-.header-logo,
-.header-mascot {
-    height: 120px;
-    width: auto;
-    flex-shrink: 0;
-}
-
-.header-text {
-    text-align: center;
-    flex-grow: 1;
-}
-
-.header h1 {
-    color: var(--color-red-fire);
-    font-size: 3.5rem;
-    line-height: 1;
-    margin: 0;
-}
-
-.header .slogan {
-    font-size: 1.3rem;
-    color: var(--text-secondary);
-    font-family: 'Teko', sans-serif;
-    text-transform: uppercase;
-}
-
-.header .contact-info {
-    margin-top: 1rem;
-    font-size: 1rem;
-}
-
-.header .contact-info p {
-    margin-bottom: 0.25rem;
-}
-
-/* =========================================================
-   2. NAVEGAÇÃO CLÁSSICA (DESKTOP)
-   ========================================================= */
-nav {
-    background-color: #222;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 3px solid var(--color-red-fire);
-}
-
-.nav-list {
-    list-style: none;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.nav-list li a {
-    display: block;
-    color: var(--text-light);
-    text-decoration: none;
-    padding: 15px 20px;
-    font-weight: 700;
-    text-transform: uppercase;
-    transition: background-color 0.3s, color 0.3s;
-    border-radius: 0;
-    border: none;
-}
-
-.nav-list li a:hover,
-.nav-list li a.active {
-    background-color: var(--color-yellow-flame);
-    color: var(--background-dark);
-}
-
-/* =========================================================
-   3. CARTÕES DE PRODUTO (DESKTOP GRID)
-   ========================================================= */
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-}
-
-.menu-card {
-    background-color: #2c2c2c;
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    /* Vertical no PC */
-    justify-content: space-between;
-    transition: transform 0.3s, box-shadow 0.3s;
-    border-left: 5px solid transparent;
-}
-
-.menu-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    border-left-color: var(--color-yellow-flame);
-}
-
-.item-details {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 15px;
-}
-
-.item-name {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-light);
-}
-
-.item-price {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--color-yellow-flame);
-    white-space: nowrap;
-}
-
-.item-description {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    font-style: italic;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    flex-grow: 1;
-}
-
-.add-to-cart-btn {
-    background-color: var(--color-yellow-flame);
-    color: var(--background-dark);
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 22px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    align-self: flex-end;
-    margin-top: auto;
-}
-
-.add-to-cart-btn:hover {
-    background-color: #ffdb58;
-    transform: scale(1.1);
-}
-
-.portion-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    justify-content: flex-end;
-}
-
-.portion-btn {
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    text-align: center;
-}
-
-/* =========================================================
-   4. CARRINHO FLUTUANTE (DESKTOP) & BARRA (MOBILE)
-   ========================================================= */
-.cart-fab {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background-color: var(--color-red-fire);
-    color: white;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    z-index: 1000;
-    transition: transform 0.2s;
-}
-
-.cart-fab:hover {
-    transform: scale(1.1);
-}
-
-.cart-count {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: var(--color-yellow-flame);
-    color: var(--background-dark);
-    font-size: 14px;
-    font-weight: bold;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Barra do iFood (Esconde no PC) */
-.bottom-cart-bar {
-    display: none !important;
-}
-
-/* =========================================================
-   5. MODAL DE FINALIZAÇÃO E COMPONENTES EXTRAS
-   ========================================================= */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1001;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-    animation: fadeIn 0.3s;
-}
-
-.modal-content {
-    background-color: #1e1e1e;
-    margin: 10% auto;
-    padding: 25px;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-    border: 1px solid #444;
-    animation: slideIn 0.4s;
-}
-
-.close-button {
-    color: #aaa;
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#cart-items-container {
-    max-height: 250px;
-    overflow-y: auto;
-    margin-bottom: 15px;
-    padding-right: 10px;
-}
-
-.cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    font-size: 16px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #333;
-}
-
-.remove-item-btn {
-    background: rgba(217, 37, 29, 0.1);
-    color: var(--color-red-fire);
-    border: none;
-    border-radius: 8px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.cart-total {
-    text-align: right;
-    font-size: 1.3rem;
-    margin: 20px 0;
-    color: var(--color-yellow-flame);
-}
-
-.customer-info input,
-.customer-info select,
-.customer-info textarea {
-    width: 100%;
-    padding: 15px;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    border: 1px solid #444;
-    background: #2a2a2a;
-    color: white;
-    font-size: 16px;
-}
-
-.finalize-order-btn {
-    background-color: #25D366;
-    color: white;
-    width: 100%;
-    padding: 16px;
-    font-size: 18px;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.hidden {
-    display: none;
-}
-
-footer {
-    background-color: var(--header-dark);
-    color: var(--text-secondary);
-    text-align: center;
-    padding: 20px;
-    margin-top: 40px;
-}
+/* 5. MODAL DE FINALIZAÇÃO E COMPONENTES EXTRAS */
+.modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); animation: fadeIn 0.3s; }
+.modal-content { background-color: #1e1e1e; margin: 10% auto; padding: 25px; border-radius: 15px; width: 90%; max-width: 500px; position: relative; border: 1px solid #444; animation: slideIn 0.4s; }
+.close-button { color: #aaa; position: absolute; top: 15px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; }
+#cart-items-container { max-height: 250px; overflow-y: auto; margin-bottom: 15px; padding-right: 10px; }
+.cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 16px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+.remove-item-btn { background: rgba(217, 37, 29, 0.1); color: var(--color-red-fire); border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer; font-weight: bold; }
+.cart-total { text-align: right; font-size: 1.3rem; margin: 20px 0; color: var(--color-yellow-flame); }
+.customer-info input, .customer-info select, .customer-info textarea { width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #444; background: #2a2a2a; color: white; font-size: 16px; }
+.finalize-order-btn { background-color: #25D366; color: white; width: 100%; padding: 16px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+.hidden { display: none; }
+footer { background-color: var(--header-dark); color: var(--text-secondary); text-align: center; padding: 20px; margin-top: 40px; }
 
 /* ANIMAÇÕES */
-.fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+.fade-in.appear { opacity: 1; transform: translateY(0); }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { transform: translateY(-50px); } to { transform: translateY(0); } }
 
-.fade-in.appear {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateY(-50px);
-    }
-
-    to {
-        transform: translateY(0);
-    }
-}
-
-/* =========================================================
-   6. RESPONSIVIDADE (MENU LATERAL E 2 COLUNAS)
-   ========================================================= */
+/* 6. RESPONSIVIDADE (MENU LATERAL E 2 COLUNAS MOBILE) */
 @media (max-width: 768px) {
-    body {
-        padding-bottom: 100px;
-    }
+    body { padding-bottom: 100px; } 
 
-    .header {
-        display: none;
-    }
+    .header { display: none; }
 
     .mobile-header-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: var(--header-dark);
-        padding: 15px 20px;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
+        display: flex; justify-content: space-between; align-items: center;
+        background: var(--header-dark); padding: 15px 20px;
+        position: sticky; top: 0; z-index: 1000;
         border-bottom: 2px solid var(--color-red-fire);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
-
-    .mobile-brand {
-        color: var(--color-yellow-flame);
-        font-weight: bold;
-        font-family: 'Teko', sans-serif;
-        font-size: 1.8rem;
-        letter-spacing: 1px;
-    }
-
-    .hamburger-btn {
-        background: transparent;
-        border: none;
-        color: white;
-        font-size: 2rem;
-        cursor: pointer;
-        padding: 5px;
-    }
+    .mobile-brand { color: var(--color-yellow-flame); font-weight: bold; font-family: 'Teko', sans-serif; font-size: 1.8rem; letter-spacing: 1px;}
+    .hamburger-btn { background: transparent; border: none; color: white; font-size: 2rem; cursor: pointer; padding: 5px; }
 
     .sidebar-nav {
-        position: fixed;
-        top: 0;
-        left: -280px;
-        width: 280px;
-        height: 100vh;
-        background: #111;
-        z-index: 2000;
-        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding-top: 80px;
-        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.8);
+        position: fixed; top: 0; left: -280px; width: 280px; height: 100vh; background: #111;
+        z-index: 2000; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        padding-top: 80px; box-shadow: 5px 0 15px rgba(0,0,0,0.8);
     }
-
-    .sidebar-nav.open {
-        left: 0;
-    }
-
+    .sidebar-nav.open { left: 0; }
     .close-sidebar {
-        display: block;
-        position: absolute;
-        top: 20px;
-        right: 25px;
-        background: transparent;
-        border: none;
-        color: #aaa;
-        font-size: 2.5rem;
-        cursor: pointer;
+        display: block; position: absolute; top: 20px; right: 25px;
+        background: transparent; border: none; color: #aaa; font-size: 2.5rem; cursor: pointer;
     }
-
-    nav {
-        border: none;
-        padding: 0;
-    }
-
-    .nav-list {
-        display: flex !important;
-        flex-direction: column;
-        gap: 0;
-        padding: 0;
-    }
-
+    
+    nav { border: none; padding: 0; }
+    .nav-list { display: flex !important; flex-direction: column; gap: 0; padding: 0; }
     .nav-list li a {
-        border-radius: 0 !important;
-        border: none !important;
-        border-bottom: 1px solid #222 !important;
-        padding: 18px 25px !important;
-        background: transparent !important;
-        color: #ccc !important;
-        font-size: 1.1rem;
+        border-radius: 0 !important; border: none !important; border-bottom: 1px solid #222 !important;
+        padding: 18px 25px !important; background: transparent !important; color: #ccc !important; font-size: 1.1rem;
         white-space: normal !important;
     }
+    .nav-list li a.active { color: var(--color-yellow-flame) !important; border-left: 5px solid var(--color-yellow-flame) !important; background: #1a1a1a !important; }
 
-    .nav-list li a.active {
-        color: var(--color-yellow-flame) !important;
-        border-left: 5px solid var(--color-yellow-flame) !important;
-        background: #1a1a1a !important;
+    h2 { font-size: 2rem; margin-top: 20px; margin-bottom: 15px; }
+    .menu-grid { 
+        display: grid !important; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 10px; 
     }
-
-    h2 {
-        font-size: 2rem;
-        margin-top: 20px;
-        margin-bottom: 15px;
-    }
-
-    .menu-grid {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        padding: 0 10px;
-    }
-
     .menu-card {
-        display: flex !important;
-        flex-direction: column;
-        justify-content: flex-start;
-        padding: 12px;
-        margin: 0;
-        border-radius: 12px;
-        background: #1a1a1a;
-        border: 1px solid #333 !important;
-        min-height: 180px;
-        position: relative;
-        padding-bottom: 40px;
+        display: flex !important; flex-direction: column; justify-content: flex-start;
+        padding: 12px; margin: 0; border-radius: 12px; background: #1a1a1a; border: 1px solid #333 !important; 
+        min-height: 180px; position: relative; padding-bottom: 40px; 
     }
-
-    .item-details {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        align-items: flex-start;
-    }
-
-    .item-name {
-        font-size: 0.95rem;
-        margin: 0;
-        color: #fff;
-        line-height: 1.1;
-        width: 100%;
-    }
-
-    .item-price {
-        font-size: 1rem;
-        margin-top: 4px;
-        color: var(--color-yellow-flame);
-        font-weight: 800;
-    }
-
+    
+    .item-details { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
+    .item-name { font-size: 0.95rem; margin: 0; color: #fff; line-height: 1.1; width: 100%; }
+    .item-price { font-size: 1rem; margin-top: 4px; color: var(--color-yellow-flame); font-weight: 800; }
     .item-description {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        font-size: 0.75rem;
-        color: #999;
-        margin-top: 5px;
-        margin-bottom: 0;
-        line-height: 1.3;
-        width: 100%;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        font-size: 0.75rem; color: #999; margin-top: 5px; margin-bottom: 0; line-height: 1.3; width: 100%;
     }
-
+    
     .add-to-cart-btn {
-        position: absolute !important;
-        bottom: 10px;
-        right: 10px;
-        width: 30px !important;
-        height: 30px !important;
-        font-size: 18px;
-        margin: 0 !important;
+        position: absolute !important; bottom: 10px; right: 10px;
+        width: 30px !important; height: 30px !important; font-size: 18px; margin: 0 !important;
     }
 
-    .portion-buttons {
-        flex-direction: row;
-        flex-wrap: wrap;
-        width: 100%;
-        margin-top: 10px;
-    }
+    .portion-buttons { flex-direction: row; flex-wrap: wrap; width: 100%; margin-top: 10px; }
+    .portion-btn { position: relative !important; width: auto !important; height: auto !important; padding: 6px !important; font-size: 0.75rem !important; }
 
-    .portion-btn {
-        position: relative !important;
-        width: auto !important;
-        height: auto !important;
-        padding: 6px !important;
-        font-size: 0.75rem !important;
-    }
-
-    /* Barra Inferior (Sacola) */
-    .cart-fab {
-        display: none !important;
-    }
-
-    .bottom-cart-bar {
-        display: flex !important;
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 92%;
-        max-width: 450px;
-        background-color: var(--color-red-fire);
-        color: white;
-        border-radius: 12px;
-        justify-content: space-between;
-        align-items: center;
-        padding: 18px 24px;
-        cursor: pointer;
-        z-index: 1000;
-        box-shadow: 0 8px 20px rgba(217, 37, 29, 0.4);
-        transition: transform 0.3s ease, opacity 0.3s;
-    }
-
-    .bottom-cart-bar.hidden {
-        transform: translate(-50%, 150px) !important;
-        opacity: 0;
-        pointer-events: none;
-    }
+    .cart-fab { display: none !important; } 
+    .bottom-cart-bar { display: flex !important; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 450px; background-color: var(--color-red-fire); color: white; border-radius: 12px; justify-content: space-between; align-items: center; padding: 18px 24px; cursor: pointer; z-index: 1000; box-shadow: 0 8px 20px rgba(217, 37, 29, 0.4); transition: transform 0.3s ease, opacity 0.3s; }
+    .bottom-cart-bar.hidden { transform: translate(-50%, 150px) !important; opacity: 0; pointer-events: none; }
 }

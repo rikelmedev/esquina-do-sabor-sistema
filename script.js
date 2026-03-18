@@ -2,12 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDs17Az4-kB--3LdBs1KwPNDrEr37jYkCU",
-    authDomain: "esquina-sabor-real.firebaseapp.com",
-    projectId: "esquina-sabor-real",
-    storageBucket: "esquina-sabor-real.firebasestorage.app",
-    messagingSenderId: "423163019859",
-    appId: "1:423163019859:web:31d00ff2004ec7e8bb7ca6"
+  apiKey: "AIzaSyDs17Az4-kB--3LdBs1KwPNDrEr37jYkCU",
+  authDomain: "esquina-sabor-real.firebaseapp.com",
+  projectId: "esquina-sabor-real",
+  storageBucket: "esquina-sabor-real.firebasestorage.app",
+  messagingSenderId: "423163019859",
+  appId: "1:423163019859:web:31d00ff2004ec7e8bb7ca6"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -16,7 +16,7 @@ const db = getFirestore(app);
 // 1. ANIMAÇÃO
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('appear');
+        if (entry.isIntersecting) entry.target.classList.add('appear'); 
     });
 }, { threshold: 0.1 });
 
@@ -33,15 +33,12 @@ const clientAddress = document.getElementById('customer-address');
 const paymentMethod = document.getElementById('payment-method');
 const orderObservations = document.getElementById('order-notes');
 
-// --- SINCRONIZAÇÃO DOS DOIS BOTÕES DE CARRINHO (PC E MOBILE) ---
-
-// Botão Mobile (Barra Inferior)
+// SINCRONIZAÇÃO DOS DOIS BOTÕES DE CARRINHO (PC E MOBILE)
 const bottomCartBar = document.getElementById('bottom-cart-bar');
 if (bottomCartBar) {
     bottomCartBar.addEventListener('click', () => cartModal.style.display = 'block');
 }
 
-// Botão PC (Bolinha Flutuante)
 const cartFab = document.getElementById('cart-fab');
 if (cartFab) {
     cartFab.addEventListener('click', () => cartModal.style.display = 'block');
@@ -53,7 +50,7 @@ document.querySelector('.close-button').addEventListener('click', () => {
 
 // Entrega/Retirada
 deliveryMethod.addEventListener('change', () => {
-    if (deliveryMethod.value === 'Entrega') {
+    if (deliveryMethod.value === 'Entrega') { 
         clientAddress.classList.remove('hidden');
     } else {
         clientAddress.classList.add('hidden');
@@ -84,27 +81,27 @@ function updateCart() {
         `;
         cartItemsContainer.appendChild(div);
     });
-
+    
     const formatTotal = total.toFixed(2).replace('.', ',');
     cartTotalValue.innerText = formatTotal;
-
+    
     const count = cart.length;
-
+    
     // Atualiza a Barra Mobile
     if (document.getElementById('cart-count-bottom')) {
         document.getElementById('cart-count-bottom').innerText = count;
         document.getElementById('cart-total-bottom').innerText = formatTotal;
     }
-
+    
     // Atualiza a Bolinha do PC
     if (document.getElementById('cart-count')) {
         document.getElementById('cart-count').innerText = count;
     }
-
+    
     // Mostra ou esconde a barra no Mobile
-    if (count > 0) {
+    if (count > 0 && bottomCartBar) {
         bottomCartBar.classList.remove('hidden');
-    } else {
+    } else if (bottomCartBar) {
         bottomCartBar.classList.add('hidden');
     }
 }
@@ -129,16 +126,16 @@ document.getElementById('finalize-order-btn').addEventListener('click', async ()
         itens: cart,
         total: parseFloat(cartTotalValue.innerText.replace(',', '.')),
         status: "Pendente",
-        data: serverTimestamp()
+        data: serverTimestamp() 
     };
 
     try {
         await addDoc(collection(db, "pedidos"), novoPedido);
-
+        
         let msg = `🍔 *PEDIDO RECEBIDO - ESQUINA DO SABOR*\n\n👤 *Cliente:* ${novoPedido.cliente}\n🛵 *Método:* ${novoPedido.metodo}\n📍 *Endereço:* ${novoPedido.endereco}\n💳 *Pagto:* ${novoPedido.pagamento}\n\n🛒 *Itens:*\n`;
         novoPedido.itens.forEach(i => msg += `• ${i.name}\n`);
         msg += `\n💰 *Total: R$ ${cartTotalValue.innerText}*`;
-
+        
         window.open(`https://api.whatsapp.com/send?phone=5517992079103&text=${encodeURIComponent(msg)}`);
 
         alert("Pedido enviado com sucesso!");
@@ -160,10 +157,10 @@ const sections = document.querySelectorAll('section');
 const navLinks = document.querySelectorAll('.nav-list li a');
 
 function updateScrollSpy() {
-    let current = 'lanches';
+    let current = 'lanches'; 
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
-        if (pageYOffset >= (sectionTop - 160)) {
+        if (pageYOffset >= (sectionTop - 160)) { 
             current = section.getAttribute('id');
         }
     });
@@ -176,7 +173,7 @@ function updateScrollSpy() {
     });
 }
 window.addEventListener('scroll', updateScrollSpy);
-updateScrollSpy();
+updateScrollSpy(); 
 
 // 5. LÓGICA DO MENU LATERAL (MOBILE)
 const hamburgerBtn = document.getElementById('hamburger-btn');
@@ -187,11 +184,12 @@ if (hamburgerBtn && sidebarNav) {
     hamburgerBtn.addEventListener('click', () => {
         sidebarNav.classList.add('open');
     });
-
+    
     closeSidebarBtn.addEventListener('click', () => {
         sidebarNav.classList.remove('open');
     });
 
+    // Fecha o menu automaticamente quando o cliente escolhe uma categoria
     document.querySelectorAll('.nav-list li a').forEach(link => {
         link.addEventListener('click', () => {
             sidebarNav.classList.remove('open');
