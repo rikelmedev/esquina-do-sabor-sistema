@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esquina do Sabor - PDV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Teko', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        :root {
+            --fire-red: #D9251D;
+            --flame-yellow: #FFC300;
+            --dark-bg: #111111;
+            --dark-card: #1a1a1a;
+            --dark-hover: #242424;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #e5e7eb;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-gradient {
+            background: linear-gradient(135deg, rgba(217, 37, 29, 0.1) 0%, rgba(255, 195, 0, 0.05) 100%);
+        }
+
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(217, 37, 29, 0.3), 0 0 40px rgba(255, 195, 0, 0.1);
+        }
+
+        .pulse-red {
+            animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(217, 37, 29, 0.5), inset 0 0 15px rgba(217, 37, 29, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(217, 37, 29, 0.8), inset 0 0 20px rgba(217, 37, 29, 0.3);
+            }
+        }
+
+        .pulse-green {
+            animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(34, 197, 94, 0.4), inset 0 0 15px rgba(34, 197, 94, 0.15);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(34, 197, 94, 0.6), inset 0 0 20px rgba(34, 197, 94, 0.2);
+            }
+        }
+
+        .btn-fire {
+            background: linear-gradient(135deg, #D9251D 0%, #ff4444 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-fire:hover {
+            box-shadow: 0 0 20px rgba(217, 37, 29, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-flame {
+            background: linear-gradient(135deg, #FFC300 0%, #FFD700 100%);
+            color: #111111;
+            transition: all 0.3s ease;
+        }
+
+        .btn-flame:hover {
+            box-shadow: 0 0 20px rgba(255, 195, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .kanban-col {
+            background: rgba(26, 26, 26, 0.6);
+            border: 1px solid rgba(217, 37, 29, 0.2);
+            border-radius: 24px;
+            min-height: 600px;
+        }
+
+        .order-card {
+            background: var(--dark-card);
+            border-left: 4px solid var(--fire-red);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            cursor: grab;
+        }
+
+        .order-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(217, 37, 29, 0.2);
+        }
+
+        .order-card.active {
+            border-left-color: var(--flame-yellow);
+            background: rgba(255, 195, 0, 0.05);
+        }
+
+        .mesa-occupied {
+            animation: pulse-red 2s infinite;
+        }
+
+        .mesa-free {
+            animation: pulse-green 2s infinite;
+        }
+
+        .badge-delivery {
+            background: rgba(217, 37, 29, 0.2);
+            color: var(--flame-yellow);
+            border: 1px solid var(--flame-yellow);
+        }
+
+        .badge-table {
+            background: rgba(34, 197, 94, 0.2);
+            color: #86efac;
+            border: 1px solid #86efac;
+        }
+
+        .time-badge {
+            background: rgba(255, 195, 0, 0.15);
+            color: var(--flame-yellow);
+            border: 1px solid rgba(255, 195, 0, 0.3);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .header-logo {
+            height: 50px;
+            width: auto;
+            filter: drop-shadow(0 0 10px rgba(217, 37, 29, 0.3));
+        }
+    </style>
+</head>
+<body class="bg-[#111111]">
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 glass-effect border-b border-[rgba(217,37,29,0.2)]">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <img src="assets/logo.png" alt="Esquina do Sabor" class="header-logo">
+                <div>
+                    <h1 class="text-2xl text-white">ESQUINA DO SABOR</h1>
+                    <p class="text-xs text-gray-400">Sistema de Gestão PDV</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <p class="text-sm text-gray-300">Bem-vindo, Admin</p>
+                    <p class="text-xs text-gray-500">Hoje, 19 de Março</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#D9251D] to-[#FFC300] flex items-center justify-center text-white font-bold">
+                    AD
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- DASHBOARD KPIs - BENTO GRID -->
+        <section class="mb-12">
+            <h2 class="text-3xl text-white mb-6">Dashboard</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- KPI 1: Faturamento (Grande) -->
+                <div class="md:col-span-2 lg:col-span-2 card-gradient glass-effect rounded-3xl p-8 neon-glow border border-[rgba(217,37,29,0.3)]">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <p class="text-gray-400 text-sm mb-2">Faturamento Hoje</p>
+                            <h3 class="text-4xl text-[#FFC300] font-bold">R$ 2.847,50</h3>
+                        </div>
+                        <div class="text-4xl">📊</div>
+                    </div>
+                    <div class="h-32 bg-black/30 rounded-2xl flex items-end justify-around p-4">
+                        <div class="w-8 bg-gradient-to-t from-[#D9251D] to-[#FFC300] h-16 rounded-t-lg"></div>
+                        <div class="w-8 bg-gradient-to-t from-[#D9251D] to-[#FFC300] h-24 rounded-t-lg"></div>
+                        <div class="w-8 bg-gradient-to-t from-[#D9251D] to-[#FFC300] h-20 rounded-t-lg"></div>
+                        <div class="w-8 bg-gradient-to-t from-[#D9251D] to-[#FFC300] h-28 rounded-t-lg"></div>
+                    </div>
+                    <div class="mt-4 text-right">
+                        <p class="text-green-400 text-sm">↑ 12% vs ontem</p>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Ticket Médio -->
+                <div class="card-gradient glass-effect rounded-3xl p-6 neon-glow border border-[rgba(255,195,0,0.2)]">
+                    <p class="text-gray-400 text-sm mb-2">Ticket Médio</p>
+                    <h3 class="text-3xl text-[#FFC300] font-bold mb-4">R$ 45,80</h3>
+                    <div class="text-xs text-gray-500">
+                        <p>📈 +3.2% esta semana</p>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Pedidos -->
+                <div class="card-gradient glass-effect rounded-3xl p-6 neon-glow border border-[rgba(217,37,29,0.2)]">
+                    <p class="text-gray-400 text-sm mb-2">Pedidos Hoje</p>
+                    <h3 class="text-3xl text-[#D9251D] font-bold mb-4">62</h3>
+                    <div class="text-xs text-gray-500">
+                        <p>⏱️ Tempo médio: 18min</p>
+                    </div>
+                </div>
+
+                <!-- KPI 4: Mesas Ocupadas -->
+                <div class="card-gradient glass-effect rounded-3xl p-6 neon-glow border border-[rgba(34,197,94,0.2)]">
+                    <p class="text-gray-400 text-sm mb-2">Mesas Ocupadas</p>
+                    <h3 class="text-3xl text-green-400 font-bold mb-4">8/12</h3>
+                    <div class="text-xs text-gray-500">
+                        <p>🪑 Taxa: 66%</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KANBAN PEDIDOS -->
+        <section class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl text-white">Gestão de Pedidos</h2>
+                <button class="btn-flame px-6 py-2 rounded-full font-semibold text-sm">
+                    + Novo Pedido
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- COLUNA: PENDENTES -->
+                <div class="kanban-col p-6">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-3 h-3 rounded-full bg-[#FFC300]"></div>
+                        <h3 class="text-lg text-white font-bold">Pendentes</h3>
+                        <span class="ml-auto text-xs bg-[rgba(255,195,0,0.2)] text-[#FFC300] px-3 py-1 rounded-full">5</span>
+                    </div>
+
+                    <div id="col-pendente" class="space-y-4">
+                        <!-- Order Card 1 -->
+                        <div class="order-card">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-sm font-bold text-[#FFC300]">#1024</span>
+                                <span class="badge-delivery text-xs px-2 py-1 rounded-lg">🏍️ Delivery</span>
+                            </div>
+                            <p class="text-sm text-gray-300 mb-3">Hambúrguer + Batata Frita</p>
+                            <div class="flex justify-between items-center">
+                                <span class="time-badge text-xs px-2 py-1 rounded-lg">⏱️ 3 min</span>
+                                <button class="btn-fire text-white text-xs px-3 py-1 rounded-lg font-semibold" id="btn-accept">Aceitar</button>
+                            </div>
+                        </div>
+
+                        <!-- Order Card 2 -->
+                        <div class="order-card">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-sm font-bold text-[#FFC300]">#1025</span>
+                                <span class="badge-table text-xs px-2 py-1 rounded-lg">🍽️ Mesa 3</span>
+                            </div>
+                            <p class="text-sm text-gray-300 mb-3">2x Pastel + Refrigerante</p>
+                            <div class="flex justify-between items-center">
+                                <span class="time-badge text-xs px-2 py-1 rounded-lg">⏱️ 1 min</span>
+                                <button class="btn-fire text-white text-xs px-3 py-1 rounded-lg font-semibold">Aceitar</button>
+                            </div>
+                        </div>
+
+                        <!-- Order Card 3 -->
+                        <div class="order-card">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-sm font-bold text-[#FFC300]">#1026</span>
+                                <span class="badge-delivery text-xs px-2 py-1 rounded-lg">🏍️ Delivery</span>
+                            </div>
+                            <p class="text-sm text-gray-300 mb-3">Coxinha + Café</p>
+                            <div class="flex justify-between items-center">
+                                <span class="time-badge text-xs px-2 py-1 rounded-lg">⏱️ 5 min</span>
+                                <button class="btn-fire text-white text-xs px-3 py-1 rounded-lg font-semibold">Aceitar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUNA: PREPARANDO -->
+                <div class="kanban-col p-6">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-3 h-3 rounded-full bg-[#D9251D]"></div>
+                        <h3 class="text-lg text-white font-bold">Preparando</h3>
+                        <span class="ml-auto text-xs bg-[rgba(217,37,29,0.2)] text-[#D9251D] px-3 py-1 rounded-full">3</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Order Card 1 -->
+                        <div class="order-card active">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-sm font-bold text-[#FFC300]">#1021</span>
+                                <span class="badge-table text-xs px-2 py-1 rounded-lg">🍽️ Mesa 1</span>
+                            </div>
+                            <p class="text-sm text-gray-300 mb-3">Moqueca + Arroz</p>
+                            <div class="flex justify-between items-center">
+                                <span class="time-badge text-xs px-2 py-1 rounded-lg">⏱️ 12 min</span>
+                                <button class="btn-flame text-[#111111] text-xs px-3 py-1 rounded-lg font-semibold">Pronto</button>
+                            </div>
+                        </div>
+
+                        <!-- Order Card 2 -->
+                        <div class="order-card active">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-sm font-bold text-[#FFC300]">#1022</span>
+                                <span class="badge-delivery text-xs px-2 py-1 rounded-lg">🏍️ Delivery</span>
+                            </div>
+                            <p class="text-sm text-gray-300 mb-3">Combo Lanche Premium</p>
+                            <div class="flex justify-between items-center">
+                                <span class="time-badge text-xs px-2 py-1 rounded-lg">⏱️ 8 min</span>
+                                <button class="btn-flame text-[#111111] text-xs px-3 py-1 rounded-lg font-semibold">Pronto</button>
+                            </div>
+                        </div>
+
+                        <!-- Order Card 3 -->
+                        <div class="order-card active">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-sm font-bold text-[#FFC300]">#1023</span>
+                                <span class="badge-table text-xs px-2 py-1 rounded-lg">🍽️ Mesa 5</span>
+                            </div>
+                            <p class="text-sm text-gray-300 mb-3">Frango Grelhado + Batata</p>
+                            <div class="flex justify-between items-center">
+                                <span class="time-badge text-xs px-2 py-1 rounded-lg">⏱️ 15 min</span>
+                                <button class="btn-flame text-[#111111] text-xs px-3 py-1 rounded-lg font-semibold">Pronto</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUNA: FINALIZADOS -->
+                <div class="kanban-col p-6">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <h3 class="text-lg text-white font-bold">Finalizados</h3>
+                        <span class="ml-auto text-xs bg-[rgba(34,197,94,0.2)] text-green-400 px-3 py-1 rounded-full">12</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Order Card 1 -->
+                        <div class="order-card opacity-75">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-sm font-bold text-gray-500">#1015</span>
+                                <span class="text-xs text-green-400">✓ Entregue</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mb-3">Salgado Sortido</p>
+                            <div class="text-xs text-gray-500">
+                                Entregue há 45 min
+                            </div>
+                        </div>
+
+                        <!-- Order Card 2 -->
+                        <div class="order-card opacity-75">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-sm font-bold text-gray-500">#1016</span>
+                                <span class="text-xs text-green-400">✓ Entregue</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mb-3">Café + Bolo</p>
+                            <div class="text-xs text-gray-500">
+                                Entregue há 30 min
+                            </div>
+                        </div>
+
+                        <!-- Order Card 3 -->
+                        <div class="order-card opacity-75">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-sm font-bold text-gray-500">#1017</span>
+                                <span class="text-xs text-green-400">✓ Entregue</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mb-3">Prato Executivo</p>
+                            <div class="text-xs text-gray-500">
+                                Entregue há 20 min
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAPA DE MESAS -->
+        <section>
+            <h2 class="text-3xl text-white mb-6">Mapa de Mesas</h2>
+            <div class="card-gradient glass-effect rounded-3xl p-8 border border-[rgba(217,37,29,0.2)]">
+                <div id="mesa-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    <!-- Mesa 1 - Ocupada -->
+                    <div class="mesa-occupied rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 1</p>
+                        <p class="text-xs text-[#FFC300] mt-1">Ocupada</p>
+                        <p class="text-xs text-gray-500 mt-2">4 pessoas</p>
+                    </div>
+
+                    <!-- Mesa 2 - Livre -->
+                    <div class="mesa-free rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 2</p>
+                        <p class="text-xs text-green-400 mt-1">Livre</p>
+                        <p class="text-xs text-gray-500 mt-2">2 lugares</p>
+                    </div>
+
+                    <!-- Mesa 3 - Ocupada -->
+                    <div class="mesa-occupied rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 3</p>
+                        <p class="text-xs text-[#FFC300] mt-1">Ocupada</p>
+                        <p class="text-xs text-gray-500 mt-2">2 pessoas</p>
+                    </div>
+
+                    <!-- Mesa 4 - Livre -->
+                    <div class="mesa-free rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 4</p>
+                        <p class="text-xs text-green-400 mt-1">Livre</p>
+                        <p class="text-xs text-gray-500 mt-2">4 lugares</p>
+                    </div>
+
+                    <!-- Mesa 5 - Ocupada -->
+                    <div class="mesa-occupied rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 5</p>
+                        <p class="text-xs text-[#FFC300] mt-1">Ocupada</p>
+                        <p class="text-xs text-gray-500 mt-2">3 pessoas</p>
+                    </div>
+
+                    <!-- Mesa 6 - Livre -->
+                    <div class="mesa-free rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 6</p>
+                        <p class="text-xs text-green-400 mt-1">Livre</p>
+                        <p class="text-xs text-gray-500 mt-2">2 lugares</p>
+                    </div>
+
+                    <!-- Mesa 7 - Ocupada -->
+                    <div class="mesa-occupied rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 7</p>
+                        <p class="text-xs text-[#FFC300] mt-1">Ocupada</p>
+                        <p class="text-xs text-gray-500 mt-2">5 pessoas</p>
+                    </div>
+
+                    <!-- Mesa 8 - Ocupada -->
+                    <div class="mesa-occupied rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 8</p>
+                        <p class="text-xs text-[#FFC300] mt-1">Ocupada</p>
+                        <p class="text-xs text-gray-500 mt-2">2 pessoas</p>
+                    </div>
+
+                    <!-- Mesa 9 - Livre -->
+                    <div class="mesa-free rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 9</p>
+                        <p class="text-xs text-green-400 mt-1">Livre</p>
+                        <p class="text-xs text-gray-500 mt-2">3 lugares</p>
+                    </div>
+
+                    <!-- Mesa 10 - Livre -->
+                    <div class="mesa-free rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 10</p>
+                        <p class="text-xs text-green-400 mt-1">Livre</p>
+                        <p class="text-xs text-gray-500 mt-2">4 lugares</p>
+                    </div>
+
+                    <!-- Mesa 11 - Ocupada -->
+                    <div class="mesa-occupied rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 11</p>
+                        <p class="text-xs text-[#FFC300] mt-1">Ocupada</p>
+                        <p class="text-xs text-gray-500 mt-2">2 pessoas</p>
+                    </div>
+
+                    <!-- Mesa 12 - Livre -->
+                    <div class="mesa-free rounded-2xl p-6 flex flex-col items-center justify-center bg-[#1a1a1a] cursor-pointer hover:scale-105 transition-transform">
+                        <div class="text-3xl mb-2">🪑</div>
+                        <p class="text-sm font-bold text-white">Mesa 12</p>
+                        <p class="text-xs text-green-400 mt-1">Livre</p>
+                        <p class="text-xs text-gray-500 mt-2">2 lugares</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Placeholder para integração com Firebase
+        console.log('PDV Interface carregada com sucesso');
+        console.log('IDs críticos disponíveis:');
+        console.log('- col-pendente: Coluna de pedidos pendentes');
+        console.log('- btn-accept: Botão de aceitar pedido');
+        console.log('- mesa-grid: Grid de mesas');
+    </script>
+</body>
+</html>
