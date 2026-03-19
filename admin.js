@@ -584,4 +584,6 @@ window.imprimirContaCliente = (cliente, itens, total, pagamento) => {
     let htmlItens = itens.map(i => `<div style="display: flex; justify-content: space-between; margin-bottom: 3px;"><span>1x ${i.name || i}</span></div>`).join('');
     area.innerHTML = `<div style="text-align: center; margin-bottom: 15px;"><h2 style="margin: 0; font-size: 18px;">ESQUINA DO SABOR</h2><p style="margin: 0; font-size: 12px;">Data: ${dataHora}</p></div><div style="border-bottom: 1px dashed #000; margin-bottom: 10px; padding-bottom: 5px;"><b>CLIENTE/MESA:</b> ${cliente}</div><div style="border-bottom: 1px dashed #000; margin-bottom: 10px; padding-bottom: 10px;"><b>CUPOM NÃO FISCAL</b><br><br>${htmlItens}</div><div style="font-size: 16px; font-weight: bold; text-align: right; margin-top: 10px;">TOTAL: R$ ${parseFloat(total).toFixed(2).replace('.', ',')}</div><div style="text-align: right; margin-top: 5px; font-size: 12px;">Pgto: ${pagamento}</div><div style="text-align: center; margin-top: 30px; font-size: 12px;">Obrigado pela preferência!<br>Volte sempre!</div>`;
     window.print();
+    setTimeout(() => { area.innerHTML = ""; }, 1000);
 };
+

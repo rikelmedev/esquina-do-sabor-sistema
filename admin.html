@@ -49,11 +49,32 @@
         .close-button { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #94a3b8; }
         .close-button:hover { color: #f8fafc; }
 
-        @media print {
-            body * { visibility: hidden; }
-            #area-impressao, #area-impressao * { visibility: visible; }
-            #area-impressao { position: absolute; left: 0; top: 0; width: 80mm; font-family: 'Courier New', Courier, monospace; color: #000; background: #fff; font-size: 14px; padding: 10px; box-sizing: border-box; }
-        }
+        #area-impressao { 
+    display: none; 
+}
+
+@media print {
+    body * { 
+        visibility: hidden; 
+    }
+    #area-impressao, #area-impressao * { 
+        display: block !important; 
+        visibility: visible; 
+    }
+    #area-impressao { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 80mm; 
+        font-family: 'Courier New', Courier, monospace; 
+        color: #000; 
+        background: #fff; 
+        font-size: 14px; 
+        padding: 10px; 
+        box-sizing: border-box; 
+    }
+}
+    
     </style>
 </head>
 <body>
