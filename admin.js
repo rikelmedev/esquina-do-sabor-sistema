@@ -326,8 +326,15 @@ window.abrirMesaAdmin = (id, mesa) => {
     document.getElementById('mesa-input-pessoas').value = "1";
 
     let htmlConsumo = `<p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px;">ITENS NA MESA:</p><div style="font-size: 0.95rem;">`;
-    if (mesa.itens && mesa.itens.length > 0) mesa.itens.forEach(item => htmlConsumo += `<div style="margin-bottom: 5px; color: #f8fafc;">• ${item}</div>`);
-    else htmlConsumo += `<div style="color: #64748b;">Nenhum item lançado</div>`;
+    
+    if (mesa.itens && mesa.itens.length > 0) {
+        mesa.itens.forEach(item => {
+            const nomeExibicao = typeof item === 'object' ? (item.nome || item.name) : item;
+            htmlConsumo += `<div style="margin-bottom: 5px; color: #f8fafc;">• ${nomeExibicao}</div>`;
+        });
+    } else {
+        htmlConsumo += `<div style="color: #64748b;">Nenhum item lançado</div>`;
+    }
     consumoContainer.innerHTML = htmlConsumo + `</div>`;
 
     if (mesa.status === 'ocupada') {
@@ -363,11 +370,20 @@ window.fecharContaMesaAdmin = async () => {
         const snap = await getDoc(mesaRef);
         const dadosMesa = snap.data();
         if (mesaTotalFinalAtual > 0) {
-            await addDoc(collection(db, "pedidos"), {
-                cliente: `Fechamento: Mesa ${dadosMesa.numero}`, status: "Finalizado", data: serverTimestamp(),
-                total: mesaTotalFinalAtual, itens: dadosMesa.itens ? dadosMesa.itens.map(nome => ({ name: nome, price: 0 })) : [],
-                metodo: "Salão (Mesa)", pagamento: dadosPagamento.pagamento, split: dadosPagamento.split 
-            });
+           await addDoc(collection(db, "pedidos"), {
+        cliente: `Fechamento: Mesa ${dadosMesa.numero}`, 
+        status: "Finalizado", 
+        data: serverTimestamp(),
+        total: mesaTotalFinalAtual, 
+        itens: dadosMesa.itens ? dadosMesa.itens.map(item => ({ 
+            name: typeof item === 'object' ? (item.nome || item.name) : item, 
+            price: typeof item === 'object' ? (item.preco || item.price || 0) : 0 
+        })) : [],
+        metodo: "Salão (Mesa)", 
+        pagamento: dadosPagamento.pagamento, 
+        split: dadosPagamento.split 
+    });
+
             imprimirContaCliente(`Mesa ${dadosMesa.numero}`, dadosMesa.itens ? dadosMesa.itens.map(nome => ({ name: nome })) : [], mesaTotalFinalAtual, dadosPagamento.pagamento);
         }
         await updateDoc(mesaRef, { status: "livre", total: 0, itens: [] });
