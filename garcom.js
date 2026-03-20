@@ -13,22 +13,31 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+let mesaAtualId = null;
+let mesaAtualNumero = null;
+
+// 2. LÓGICA DO BOTÃO ABRIR
+const btnAbrirMesa = document.getElementById('btn-abrir-mesa');
+const inputNumeroMesa = document.getElementById('numero-mesa-input');
+
 if (btnAbrirMesa) {
     btnAbrirMesa.addEventListener('click', async () => {
-        const numero = inputNumeroMesa.value.trim();
-        if (!numero) {
+        const numeroRaw = inputNumeroMesa.value.trim();
+        if (!numeroRaw) {
             alert('⚠️ Digite o número da mesa!');
             return;
         }
 
-        const q = query(collection(db, "mesas"), where("numero", "==", numero.toString()));
+        const numeroNum = parseInt(numeroRaw); 
+
+        const q = query(collection(db, "mesas"), where("numero", "==", numeroNum));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
             const docMesa = querySnapshot.docs[0];
             abrirMesaGarcom(docMesa.id, docMesa.data());
         } else {
-            const novaMesa = { numero: numero.toString(), status: "livre", total: 0, itens: [] };
+            const novaMesa = { numero: numeroNum, status: "livre", total: 0, itens: [] };
             const docRef = await addDoc(collection(db, "mesas"), novaMesa);
             abrirMesaGarcom(docRef.id, novaMesa);
         }
@@ -37,13 +46,6 @@ if (btnAbrirMesa) {
     });
 }
 
-const btnAbrirMesa = document.getElementById('btn-abrir-mesa');
-const inputNumeroMesa = document.getElementById('numero-mesa-input');
-
-let mesaAtualId = null;
-let mesaAtualNumero = null;
-
-// 1. RENDERIZAR MESAS DINAMICAMENTE
 const tableSelector = document.querySelector('.table-selector');
 if (tableSelector) {
     onSnapshot(collection(db, "mesas"), (snapshot) => {
@@ -64,17 +66,9 @@ if (tableSelector) {
             btn.onclick = () => abrirMesaGarcom(docSnap.id, mesa);
             tableSelector.appendChild(btn);
         });
-
-        // Botão de adicionar mesa (A sua regra de negócio!)
-        const btnNova = document.createElement('button');
-        btnNova.className = 'table-btn border-dashed border-gray-500 text-gray-400';
-        btnNova.innerHTML = '+ Nova Mesa';
-        btnNova.onclick = adicionarNovaMesaGarcom;
-        tableSelector.appendChild(btnNova);
     });
 }
 
-// 2. ABRIR MESA (Seu modal antigo, visual novo)
 window.abrirMesaGarcom = (id, mesa) => {
     mesaAtualId = id;
     mesaAtualNumero = mesa.numero;
@@ -130,17 +124,6 @@ window.abrirDrawer = () => {
     document.getElementById('drawer-content').classList.add('active');
 };
 
-// 3. RESTAURANDO SUAS FUNÇÕES ORIGINAIS
-window.adicionarNovaMesaGarcom = async () => {
-    const numeroStr = prompt("Digite o número da nova mesa (Ex: 15):");
-    if (!numeroStr) return; 
-    const numeroMesa = parseInt(numeroStr);
-    if (isNaN(numeroMesa) || numeroMesa <= 0) return alert("Número inválido.");
-    try {
-        await addDoc(collection(db, "mesas"), { numero: numeroMesa, status: "livre", total: 0, itens: [] });
-    } catch (e) { console.error(e); }
-};
-
 window.ocuparMesaGarcom = async () => {
     try {
         await updateDoc(doc(db, "mesas", mesaAtualId), { status: "ocupada" });
@@ -148,7 +131,7 @@ window.ocuparMesaGarcom = async () => {
 };
 
 window.removerItemGarcom = async (index, precoAAbater) => {
-    if(!confirm("Tem certeza?")) return;
+    if(!confirm('Tem certeza que deseja remover este item')) return;
     const mesaRef = doc(db, "mesas", mesaAtualId);
     try {
         const snap = await getDoc(mesaRef);
@@ -156,29 +139,26 @@ window.removerItemGarcom = async (index, precoAAbater) => {
         const novosItens = [...dados.itens];
         novosItens.splice(index, 1);
         const novoTotal = Math.max(0, (dados.total || 0) - precoAAbater);
-        
         await updateDoc(mesaRef, { total: novoTotal, itens: novosItens });
-        
         abrirMesaGarcom(mesaAtualId, { ...dados, total: novoTotal, itens: novosItens });
     } catch (e) { console.error(e); }
 };
 
 window.fecharContaGarcom = async () => {
-    if (!confirm("Avisar o Caixa que esta mesa pediu a conta?")) return;
+    if (!confirm('Avisar o Caixa que esta mesa pediu a conta')) return;
     const mesaRef = doc(db, "mesas", mesaAtualId);
     try {
         await updateDoc(mesaRef, { status: "fechando" });
         fecharModalGarcom();
-        alert("Caixa avisado! Aguarde a impressão da conta.");
+        alert('Caixa avisado com sucesso');
     } catch (e) { console.error(e); }
 };
 
-// 4. DRAWER COMO CARRINHO (Novo Enviar Pedido)
 const submitOrderBtn = document.getElementById('submit-order-btn');
 if (submitOrderBtn) {
     submitOrderBtn.addEventListener('click', async (e) => {
         e.preventDefault();
-        if (!mesaAtualId) return alert('Abra uma mesa primeiro!');
+        if (!mesaAtualId) return alert('Abra uma mesa primeiro');
 
         let itensPedido = [];
         let totalPedido = 0;
@@ -200,9 +180,9 @@ if (submitOrderBtn) {
             }
         });
 
-        if (itensPedido.length === 0) return alert('Adicione pelo menos um produto na gaveta.');
+        if (itensPedido.length === 0) return alert('Adicione produtos na gaveta');
 
-        submitOrderBtn.innerHTML = "Enviando...";
+        submitOrderBtn.innerHTML = "Enviando";
 
         try {
             const mesaRef = doc(db, "mesas", mesaAtualId);
@@ -219,25 +199,24 @@ if (submitOrderBtn) {
                 cliente: `MESA ${mesaAtualNumero}`,
                 status: "Preparando",
                 data: serverTimestamp(),
-                total: 0,
+                total: totalPedido,
                 itens: itensPedido.map(i => ({ name: i.name, price: i.price })),
                 metodo: "Consumo na Mesa",
                 pagamento: "Comanda Cozinha"
             });
 
-            // Limpa Drawer
             document.querySelectorAll('.quantity-display').forEach(d => d.textContent = '0');
             document.getElementById('observation-input').value = "";
             document.getElementById('drawer-overlay').classList.remove('active');
             document.getElementById('drawer-content').classList.remove('active');
-            submitOrderBtn.innerHTML = "✓ Confirmar Pedido";
+            submitOrderBtn.innerHTML = "Confirmar Pedido";
             fecharModalGarcom(); 
 
             alert(`Pedido enviado para a Mesa ${mesaAtualNumero}`);
         } catch(erro) {
             console.error(erro);
-            submitOrderBtn.innerHTML = "✓ Confirmar Pedido";
-            alert("Erro ao enviar pedido");
+            submitOrderBtn.innerHTML = "Confirmar Pedido";
+            alert('Erro ao enviar pedido');
         }
     });
 }
