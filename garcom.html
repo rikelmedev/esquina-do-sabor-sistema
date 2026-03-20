@@ -2,140 +2,221 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Comanda Mobile - Esquina do Sabor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esquina do Sabor - App Garçom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* RESET E BASE */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: #0f172a; color: #f8fafc; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
-        
-        /* CABEÇALHO */
-        header { background: #1e293b; padding: 20px; text-align: center; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        h1 { font-size: 1.5rem; color: #3b82f6; font-weight: 800; letter-spacing: -0.5px; }
-        .subtitle { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
-
-        /* GRID DE MESAS */
-        .container { padding: 20px; }
-        .mesa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        
-        .mesa-card { 
-            background: #1e293b; border-radius: 16px; padding: 20px; text-align: center; 
-            border: 2px solid #334155; transition: all 0.2s ease; cursor: pointer;
-            display: flex; flex-direction: column; justify-content: center; min-height: 130px;
-        }
-        .mesa-card:active { transform: scale(0.95); }
-        .mesa-card.livre { border-color: #10b981; background: rgba(16, 185, 129, 0.05); }
-        .mesa-card.ocupada { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
-        
-        .mesa-numero { font-size: 2rem; font-weight: 800; color: #f8fafc; }
-        .mesa-status { font-size: 0.75rem; text-transform: uppercase; font-weight: 600; margin-top: 5px; letter-spacing: 1px; }
-        .mesa-card.livre .mesa-status { color: #10b981; }
-        .mesa-card.ocupada .mesa-status { color: #ef4444; }
-        .mesa-total { font-size: 1.1rem; font-weight: 800; color: #f59e0b; margin-top: 10px; }
-
-        /* BOTÃO FLUTUANTE (NOVA MESA) */
-        .fab-button {
-            position: fixed; bottom: 25px; right: 25px; background: #3b82f6; color: white;
-            width: 60px; height: 60px; border-radius: 30px; display: flex; align-items: center; justify-content: center;
-            font-size: 30px; box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5); border: none; cursor: pointer; z-index: 90;
-        }
-
-        /* MODAL PREMIUM */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; align-items: flex-end; justify-content: center; }
-        .modal-content { background: #0f172a; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 25px; border-top: 1px solid #334155; animation: slideUp 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-size: 1.5rem; font-weight: 800; color: #f8fafc; }
-        .close-btn { background: #1e293b; border: none; color: #94a3b8; width: 36px; height: 36px; border-radius: 18px; font-size: 20px; cursor: pointer; }
-        
-        /* LISTA DE ITENS NA MESA */
-        .consumo-box { background: #1e293b; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #334155; }
-        .item-row:last-child { border-bottom: none; }
-        .item-name { color: #f8fafc; font-size: 0.95rem; flex: 1; }
-        .item-price { color: #94a3b8; font-size: 0.9rem; margin-right: 10px; }
-        .btn-remove-item { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        
-        .total-row { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #334155; font-size: 1.3rem; font-weight: 800; }
-        
-        /* FORMULÁRIOS E BOTÕES */
-        label { display: block; color: #94a3b8; font-size: 0.85rem; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; }
-        select, input { width: 100%; background: #1e293b; border: 1px solid #334155; color: white; padding: 15px; border-radius: 12px; font-size: 1rem; margin-bottom: 15px; appearance: none; }
-        select:focus, input:focus { outline: none; border-color: #3b82f6; }
-        
-        .btn-primary { background: #3b82f6; color: white; width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-bottom: 10px; }
-        .btn-success { background: #10b981; color: white; width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-bottom: 10px; }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; width: 100%; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; }
+        * { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Teko', sans-serif; font-weight: 700; letter-spacing: 0.5px; }
+        :root { --fire-red: #D9251D; --flame-yellow: #FFC300; --dark-bg: #111111; --dark-card: #1a1a1a; }
+        body { background-color: var(--dark-bg); color: #e5e7eb; overflow-x: hidden; }
+        .glass-effect { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-flame { background: linear-gradient(135deg, #FFC300 0%, #FFD700 100%); color: #111111; transition: all 0.3s ease; }
+        .btn-flame:active { transform: scale(0.95); }
+        .btn-fire { background: linear-gradient(135deg, #D9251D 0%, #ff4444 100%); transition: all 0.3s ease; }
+        .btn-fire:active { transform: scale(0.95); }
+        .drawer-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .drawer-overlay.active { opacity: 1; pointer-events: auto; }
+        .drawer-content { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark-bg); border-top: 2px solid var(--fire-red); border-radius: 24px 24px 0 0; z-index: 50; max-height: 90vh; transform: translateY(100%); transition: transform 0.3s ease; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .drawer-content.active { transform: translateY(0); }
+        .product-card { background: var(--dark-card); border: 1px solid rgba(217, 37, 29, 0.2); border-radius: 16px; padding: 12px; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; height: 100%; }
+        .product-card:active { transform: scale(0.98); box-shadow: 0 5px 15px rgba(217, 37, 29, 0.3); }
+        .product-icon { font-size: 2.5rem; margin-bottom: 8px; text-align: center; }
+        .product-name { font-size: 0.875rem; font-weight: 600; color: #fff; margin-bottom: 4px; line-height: 1.2; }
+        .product-price { font-size: 1rem; color: var(--flame-yellow); font-weight: 700; margin-top: auto; }
+        .quantity-selector { display: flex; align-items: center; gap: 8px; background: rgba(217, 37, 29, 0.1); border-radius: 12px; padding: 8px; margin-top: 8px; }
+        .quantity-btn { width: 28px; height: 28px; border-radius: 6px; border: none; background: var(--fire-red); color: white; font-weight: bold; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
+        .quantity-display { flex: 1; text-align: center; color: var(--flame-yellow); font-weight: bold; }
+        .table-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .table-btn { padding: 12px; border-radius: 12px; border: 2px solid rgba(217, 37, 29, 0.3); background: transparent; color: #fff; cursor: pointer; transition: all 0.3s ease; font-weight: 600; }
+        .table-btn.selected { border-color: var(--flame-yellow); background: rgba(255, 195, 0, 0.1); color: var(--flame-yellow); }
+        .order-summary { background: rgba(217, 37, 29, 0.1); border: 1px solid rgba(217, 37, 29, 0.3); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+        .summary-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .summary-total { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; margin-top: 12px; border-top: 2px solid var(--flame-yellow); font-size: 1.25rem; font-weight: bold; color: var(--flame-yellow); }
+        .header-logo { height: 40px; width: auto; filter: drop-shadow(0 0 10px rgba(217, 37, 29, 0.3)); }
     </style>
 </head>
-<body>
-
-    <header>
-        <h1>ESQUINA COMANDA</h1>
-        <div class="subtitle">Visão do Salão</div>
-    </header>
-
-    <div class="container">
-        <div id="mesa-grid" class="mesa-grid">
-            </div>
-    </div>
-
-    <button class="fab-button" onclick="adicionarNovaMesaGarcom()">+</button>
-
-    <div id="mesa-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title" id="modal-titulo-mesa">Mesa --</div>
-                <button class="close-btn" onclick="fecharModal()">&times;</button>
-            </div>
-
-            <div id="area-livre" style="display: none;">
-                <button class="btn-success" onclick="ocuparMesaGarcom()">🍽️ Ocupar Mesa Agora</button>
-            </div>
-
-            <div id="area-ocupada" style="display: none;">
-                <div class="consumo-box">
-                    <div style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px; font-weight: 600;">ITENS DA CONTA</div>
-                    <div id="itens-consumo"></div>
-                    <div class="total-row">
-                        <span style="color: #f8fafc;">Total:</span>
-                        <span style="color: #f59e0b;" id="total-consumo">R$ 0,00</span>
-                    </div>
+<body class="bg-[#111111]">
+    <header class="sticky top-0 z-30 glass-effect border-b border-[rgba(217,37,29,0.2)] px-4 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="Imagens/Logo.png" alt="Esquina do Sabor" class="header-logo">
+                <div>
+                    <h1 class="text-lg text-white font-bold">GARÇOM</h1>
+                    <p class="text-xs text-gray-400">Pedidos Rápidos</p>
                 </div>
-
-                <label>Lançar Novo Produto</label>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <select id="select-produto" style="margin-bottom: 0; flex: 1;">
-                        <option value="">Escolha um produto...</option>
-                        <optgroup label="🍔 LANCHES">
-                            <option value="19.00">X-Burguer</option>
-                            <option value="28.00">X-Tudo</option>
-                        </optgroup>
-                        <optgroup label="🥤 BEBIDAS">
-                            <option value="6.00">Refrigerante Lata</option>
-                            <option value="10.00">Heineken</option>
-                        </optgroup>
-                    </select>
-                    
-                    <input type="number" id="qtd-garcom" value="1" min="1" style="width: 70px; margin-bottom: 0; padding: 15px; text-align: center;">
-                    
-                    <button class="btn-primary" style="width: auto; padding: 0 20px; margin-bottom: 0;" onclick="adicionarAoCarrinhoGarcom()">+</button>
-                </div>
-                
-                <input type="text" id="obs-garcom" placeholder="Observações (Ex: Sem cebola)..." style="padding: 12px; font-size: 0.9rem; margin-bottom: 20px; width: 100%; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 12px;">
-
-                <div id="area-carrinho-garcom" style="display: none; background: rgba(59, 130, 246, 0.1); border: 1px dashed #3b82f6; border-radius: 12px; padding: 15px; margin-bottom: 20px;">
-                    <div style="color: #3b82f6; font-size: 0.85rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase;">🛒 Enviar para a Cozinha:</div>
-                    <div id="lista-carrinho-garcom" style="margin-bottom: 15px;"></div>
-                    <button class="btn-success" onclick="enviarPedidoGarcom()" style="margin-bottom: 0;">👨‍🍳 Confirmar e Enviar</button>
-                </div>
-
-                <button class="btn-danger" onclick="fecharContaGarcom()">🧾 Solicitar Fechamento de Conta</button>
+            </div>
+            <div class="text-right">
+                <p class="text-xs text-gray-300">Garçom #01</p>
+                <p class="text-xs text-[#FFC300] font-bold">Ativo</p>
             </div>
         </div>
+    </header>
+
+    <main class="pb-32 px-4 pt-4">
+        <section class="mb-6">
+            <h2 class="text-sm font-bold text-gray-300 mb-3">Selecione a Mesa</h2>
+            <div class="table-selector">
+                <button class="table-btn" data-table="1">🪑 Mesa 1</button>
+                <button class="table-btn" data-table="2">🪑 Mesa 2</button>
+                <button class="table-btn" data-table="3">🪑 Mesa 3</button>
+                <button class="table-btn" data-table="4">🪑 Mesa 4</button>
+                <button class="table-btn" data-table="5">🪑 Mesa 5</button>
+                <button class="table-btn" data-table="6">🪑 Mesa 6</button>
+                <button class="table-btn" data-table="7">🪑 Mesa 7</button>
+                <button class="table-btn" data-table="8">🪑 Mesa 8</button>
+                <button class="table-btn" data-table="9">🪑 Mesa 9</button>
+                <button class="table-btn" data-table="10">🪑 Mesa 10</button>
+                <button class="table-btn" data-table="11">🪑 Mesa 11</button>
+                <button class="table-btn" data-table="12">🪑 Mesa 12</button>
+            </div>
+        </section>
+
+        <section id="order-summary-section" class="mb-6" style="display: none;">
+            <h2 class="text-sm font-bold text-gray-300 mb-3">Resumo do Pedido</h2>
+            <div class="order-summary">
+                <div id="summary-items"></div>
+                <div class="summary-total">
+                    <span>Total:</span>
+                    <span id="total-price">R$ 0,00</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="fixed bottom-6 left-4 right-4 z-20">
+            <button id="open-drawer-btn" class="btn-flame w-full py-4 rounded-full font-bold text-lg shadow-lg">
+                ➕ Adicionar Produtos
+            </button>
+        </div>
+    </main>
+
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+    <div id="drawer-content" class="drawer-content">
+        <div class="sticky top-0 glass-effect z-10 px-4 py-3 border-b border-[rgba(217,37,29,0.2)]">
+            <div style="width: 40px; height: 4px; background: rgba(255, 255, 255, 0.2); border-radius: 2px; margin: 12px auto;"></div>
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">Selecione Produtos</h3>
+                <button id="close-drawer-btn" class="text-2xl text-gray-400">✕</button>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <div class="mb-8">
+                <h4 class="text-sm font-bold text-[#FFC300] mb-4">🍔 Lanches</h4>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="product-card" data-product="x-burger" data-price="19.00" data-name="X-Burguer">
+                        <div class="product-icon">🍔</div>
+                        <div class="product-name">X-Burguer</div>
+                        <div class="product-price">R$ 19,00</div>
+                        <div class="quantity-selector">
+                            <button class="quantity-btn minus">−</button>
+                            <div class="quantity-display">0</div>
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product="x-salada" data-price="20.00" data-name="X-Salada">
+                        <div class="product-icon">🥗</div>
+                        <div class="product-name">X-Salada</div>
+                        <div class="product-price">R$ 20,00</div>
+                        <div class="quantity-selector">
+                            <button class="quantity-btn minus">−</button>
+                            <div class="quantity-display">0</div>
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                    </div>
+                    <div class="product-card" data-product="x-tudo" data-price="28.00" data-name="X-Tudo">
+                        <div class="product-icon">🔥</div>
+                        <div class="product-name">X-Tudo</div>
+                        <div class="product-price">R$ 28,00</div>
+                        <div class="quantity-selector">
+                            <button class="quantity-btn minus">−</button>
+                            <div class="quantity-display">0</div>
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h4 class="text-sm font-bold text-[#FFC300] mb-4">🥤 Bebidas</h4>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="product-card" data-product="refrigerante" data-price="5.00" data-name="Refrigerante">
+                        <div class="product-icon">🥤</div>
+                        <div class="product-name">Refrigerante</div>
+                        <div class="product-price">R$ 5,00</div>
+                        <div class="quantity-selector">
+                            <button class="quantity-btn minus">−</button>
+                            <div class="quantity-display">0</div>
+                            <button class="quantity-btn plus">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <textarea id="observation-input" style="width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(217, 37, 29, 0.2); border-radius: 12px; padding: 12px; color: #fff; font-size: 0.875rem; margin-top: 12px; resize: none;" placeholder="Adicione observações (Ex: Sem cebola)..." rows="3"></textarea>
+            </div>
+
+            <button id="submit-order-btn" class="btn-fire w-full py-4 rounded-full font-bold text-lg mb-6">✓ Confirmar Pedido</button>
+        </div>
     </div>
+
+    <script>
+        let selectedTable = null;
+        let orderItems = [];
+        const drawerOverlay = document.getElementById('drawer-overlay');
+        const drawerContent = document.getElementById('drawer-content');
+        const openDrawerBtn = document.getElementById('open-drawer-btn');
+        const closeDrawerBtn = document.getElementById('close-drawer-btn');
+        const tableButtons = document.querySelectorAll('.table-btn');
+        const productCards = document.querySelectorAll('.product-card');
+        const submitOrderBtn = document.getElementById('submit-order-btn');
+
+        openDrawerBtn.addEventListener('click', () => {
+            drawerOverlay.classList.add('active');
+            drawerContent.classList.add('active');
+        });
+
+        closeDrawerBtn.addEventListener('click', () => {
+            drawerOverlay.classList.remove('active');
+            drawerContent.classList.remove('active');
+        });
+
+        tableButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tableButtons.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedTable = btn.dataset.table;
+            });
+        });
+
+        productCards.forEach(card => {
+            const minusBtn = card.querySelector('.minus');
+            const plusBtn = card.querySelector('.plus');
+            const quantityDisplay = card.querySelector('.quantity-display');
+
+            minusBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evita conflitos
+                let qty = parseInt(quantityDisplay.textContent);
+                if (qty > 0) quantityDisplay.textContent = qty - 1;
+            });
+
+            plusBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evita conflitos
+                let qty = parseInt(quantityDisplay.textContent);
+                quantityDisplay.textContent = qty + 1;
+            });
+        });
+
+        submitOrderBtn.addEventListener('click', () => {
+            if (!selectedTable) {
+                alert('⚠️ Por favor, selecione uma mesa!');
+                return;
+            }
+            console.log(`Pedido pronto para envio: Mesa ${selectedTable}`);
+        });
+    </script>
 
     <script type="module" src="garcom.js"></script>
 </body>
