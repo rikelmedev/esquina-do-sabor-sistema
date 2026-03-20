@@ -329,6 +329,7 @@ window.abrirMesaAdmin = (id, mesa) => {
     
     if (mesa.itens && mesa.itens.length > 0) {
         mesa.itens.forEach(item => {
+            // Extrai o nome do item se ele for um objeto, ou usa o texto se for string
             const nomeExibicao = typeof item === 'object' ? (item.nome || item.name) : item;
             htmlConsumo += `<div style="margin-bottom: 5px; color: #f8fafc;">• ${nomeExibicao}</div>`;
         });

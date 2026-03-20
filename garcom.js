@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, doc, updateDoc, getDoc, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDs17Az4-kB--3LdBs1KwPNDrEr37jYkCU",
@@ -12,6 +12,33 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+if (btnAbrirMesa) {
+    btnAbrirMesa.addEventListener('click', async () => {
+        const numero = inputNumeroMesa.value.trim();
+        if (!numero) {
+            alert('⚠️ Digite o número da mesa!');
+            return;
+        }
+
+        const q = query(collection(db, "mesas"), where("numero", "==", numero.toString()));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const docMesa = querySnapshot.docs[0];
+            abrirMesaGarcom(docMesa.id, docMesa.data());
+        } else {
+            const novaMesa = { numero: numero.toString(), status: "livre", total: 0, itens: [] };
+            const docRef = await addDoc(collection(db, "mesas"), novaMesa);
+            abrirMesaGarcom(docRef.id, novaMesa);
+        }
+        
+        inputNumeroMesa.value = '';
+    });
+}
+
+const btnAbrirMesa = document.getElementById('btn-abrir-mesa');
+const inputNumeroMesa = document.getElementById('numero-mesa-input');
 
 let mesaAtualId = null;
 let mesaAtualNumero = null;
@@ -121,7 +148,7 @@ window.ocuparMesaGarcom = async () => {
 };
 
 window.removerItemGarcom = async (index, precoAAbater) => {
-    if(!confirm("Tem certeza que deseja remover este item da conta?")) return;
+    if(!confirm("Tem certeza?")) return;
     const mesaRef = doc(db, "mesas", mesaAtualId);
     try {
         const snap = await getDoc(mesaRef);
@@ -129,7 +156,9 @@ window.removerItemGarcom = async (index, precoAAbater) => {
         const novosItens = [...dados.itens];
         novosItens.splice(index, 1);
         const novoTotal = Math.max(0, (dados.total || 0) - precoAAbater);
+        
         await updateDoc(mesaRef, { total: novoTotal, itens: novosItens });
+        
         abrirMesaGarcom(mesaAtualId, { ...dados, total: novoTotal, itens: novosItens });
     } catch (e) { console.error(e); }
 };
