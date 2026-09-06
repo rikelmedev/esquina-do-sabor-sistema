@@ -179,20 +179,31 @@ updateScrollSpy();
 const hamburgerBtn = document.getElementById('hamburger-btn');
 const closeSidebarBtn = document.getElementById('close-sidebar');
 const sidebarNav = document.getElementById('sidebar-nav');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
 
 if (hamburgerBtn && sidebarNav) {
     hamburgerBtn.addEventListener('click', () => {
         sidebarNav.classList.add('open');
+        if (sidebarOverlay) sidebarOverlay.classList.add('open');
     });
-    
+
     closeSidebarBtn.addEventListener('click', () => {
         sidebarNav.classList.remove('open');
+        if (sidebarOverlay) sidebarOverlay.classList.remove('open');
     });
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', () => {
+            sidebarNav.classList.remove('open');
+            sidebarOverlay.classList.remove('open');
+        });
+    }
 
     // Fecha o menu automaticamente quando o cliente escolhe uma categoria
     document.querySelectorAll('.nav-list li a').forEach(link => {
         link.addEventListener('click', () => {
             sidebarNav.classList.remove('open');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('open');
         });
     });
 }
