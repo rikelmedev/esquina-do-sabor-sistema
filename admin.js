@@ -385,7 +385,9 @@ window.fecharContaMesaAdmin = async () => {
         split: dadosPagamento.split 
     });
 
-            imprimirContaCliente(`Mesa ${dadosMesa.numero}`, dadosMesa.itens ? dadosMesa.itens.map(nome => ({ name: nome })) : [], mesaTotalFinalAtual, dadosPagamento.pagamento);
+            imprimirContaCliente(`Mesa ${dadosMesa.numero}`, dadosMesa.itens ? dadosMesa.itens.map(item => ({
+                name: typeof item === 'object' ? (item.nome || item.name) : item
+            })) : [], mesaTotalFinalAtual, dadosPagamento.pagamento);
         }
         await updateDoc(mesaRef, { status: "livre", total: 0, itens: [] });
         fecharModalMesaAdmin();
