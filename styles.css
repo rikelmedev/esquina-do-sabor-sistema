@@ -226,6 +226,184 @@ section {
 }
 
 /* =========================================================
+   1B. HERO (CTA + DIFERENCIAIS), CATEGORIAS E DESTAQUES
+   ========================================================= */
+.hero-eyebrow {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-yellow-flame);
+    background: var(--color-yellow-flame-soft);
+    border: 1px solid rgba(255, 195, 0, 0.3);
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 10px;
+}
+
+.hero-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    max-width: 480px;
+    margin: 10px auto 0;
+}
+
+.hero-cta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.btn-hero {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 13px 26px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    border: 1px solid transparent;
+}
+
+.btn-hero-primary {
+    background: var(--gradient-brand);
+    color: #1a1005;
+    box-shadow: var(--shadow-glow-red);
+}
+
+.btn-hero-outline {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-light);
+    border-color: var(--surface-border);
+}
+
+.btn-hero:hover {
+    transform: translateY(-2px);
+}
+
+.feature-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--surface-border);
+    position: relative;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.feature-icon {
+    font-size: 1.3rem;
+}
+
+.categorias-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+}
+
+.categoria-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    background: linear-gradient(155deg, var(--surface-2) 0%, var(--surface-1) 100%);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius-card);
+    padding: 24px 12px;
+    transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.categoria-card:hover {
+    transform: translateY(-4px);
+    border-color: transparent;
+    box-shadow: var(--shadow-elevate);
+}
+
+.categoria-icon {
+    font-size: 2.2rem;
+}
+
+.categoria-nome {
+    color: var(--text-light);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+.categoria-count {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+.destaques-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+}
+
+.destaque-media {
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+    background: var(--color-red-fire-soft);
+    border-radius: 14px;
+    margin-bottom: 14px;
+}
+
+.promo-banner-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.promo-banner {
+    background: linear-gradient(155deg, var(--surface-2) 0%, var(--surface-1) 100%);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius-card);
+    padding: 32px;
+    text-align: center;
+}
+
+.promo-banner-alt {
+    background: linear-gradient(155deg, rgba(255, 195, 0, 0.08) 0%, var(--surface-1) 100%);
+}
+
+.promo-icon {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.promo-banner h3 {
+    font-size: 1.7rem;
+    color: var(--text-light);
+    margin-bottom: 6px;
+}
+
+.promo-banner p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 18px;
+}
+
+/* =========================================================
    2. NAVEGAÇÃO CLÁSSICA (DESKTOP)
    ========================================================= */
 nav {
@@ -511,25 +689,81 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     margin-bottom: 10px;
     font-size: 15px;
     padding-bottom: 10px;
     border-bottom: 1px solid var(--surface-border);
 }
 
-.remove-item-btn {
-    background: var(--color-red-fire-soft);
-    color: var(--color-red-fire);
-    border: none;
-    border-radius: 8px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background var(--transition-base);
+.cart-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
 }
 
-.remove-item-btn:hover {
-    background: rgba(217, 37, 29, 0.25);
+.cart-item-name {
+    color: var(--text-light);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cart-item-unit {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.qty-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--surface-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-light);
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.qty-btn:hover {
+    background: var(--color-yellow-flame-soft);
+    border-color: var(--color-yellow-flame);
+}
+
+.qty-value {
+    min-width: 16px;
+    text-align: center;
+    font-weight: 700;
+    color: var(--color-yellow-flame);
+}
+
+.cart-item-subtotal {
+    min-width: 68px;
+    text-align: right;
+    font-weight: 700;
+    color: var(--text-light);
+}
+
+.cart-empty {
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: 24px 0;
 }
 
 .cart-total {
@@ -711,6 +945,56 @@ footer p {
     .header .contact-info p {
         font-size: 0.72rem;
         padding: 5px 10px;
+    }
+
+    .hero-subtitle {
+        font-size: 0.9rem;
+        padding: 0 10px;
+    }
+
+    .hero-cta {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-hero {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .feature-strip {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .categorias-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        padding: 0 10px;
+    }
+
+    .categoria-card {
+        padding: 16px 8px;
+    }
+
+    .categoria-icon {
+        font-size: 1.8rem;
+    }
+
+    .categoria-nome {
+        font-size: 0.8rem;
+    }
+
+    .destaques-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 0 10px;
+    }
+
+    .promo-banner-section {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 0 10px;
     }
 
     /* Barra Fixa Mobile (Hambúrguer) */

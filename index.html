@@ -20,8 +20,16 @@
             <img src="Imagens/Logo.png" alt="Logo Esquina do Sabor" class="header-logo">
 
             <div class="header-text">
-                <h1>Esquina do Sabor</h1>
+                <span class="hero-eyebrow fade-in">🔥 Sabor de bairro, direto na sua casa</span>
+                <h1 class="fade-in">Esquina do Sabor</h1>
                 <p class="slogan">Lanches e Porções</p>
+                <p class="hero-subtitle fade-in">Lanches artesanais, porções generosas e entrega rápida em Palmares
+                    Paulistas.</p>
+                <div class="hero-cta fade-in">
+                    <a href="#lanches" class="btn-hero btn-hero-primary">Ver Cardápio</a>
+                    <a href="https://wa.me/5517992079103" target="_blank" rel="noopener"
+                        class="btn-hero btn-hero-outline">📱 Pedir pelo WhatsApp</a>
+                </div>
                 <div class="contact-info">
                     <p>📍 Rua 15 de Novembro, N°947. Palmares Paulistas - SP</p>
                     <p>📞Disque Entrega: (17) 99207-9103</p>
@@ -29,6 +37,13 @@
             </div>
 
             <img src="Imagens/Mascote.png" alt="Mascote Esquina do Sabor" class="header-mascot">
+        </div>
+
+        <div class="feature-strip container">
+            <div class="feature-item"><span class="feature-icon">🛵</span><span>Entrega Rápida</span></div>
+            <div class="feature-item"><span class="feature-icon">🔥</span><span>Feito na Hora</span></div>
+            <div class="feature-item"><span class="feature-icon">💳</span><span>Pix, Débito e Crédito</span></div>
+            <div class="feature-item"><span class="feature-icon">📱</span><span>Peça pelo WhatsApp</span></div>
         </div>
     </header>
 
@@ -53,6 +68,92 @@
     </nav>
 
     <main class="container">
+
+        <section id="categorias" class="categorias-section">
+            <h2 class="fade-in">Explore por Categoria</h2>
+            <div class="categorias-grid">
+                <a href="#lanches" class="categoria-card fade-in">
+                    <span class="categoria-icon">🍔</span>
+                    <span class="categoria-nome">Lanches</span>
+                    <span class="categoria-count" data-count-for="lanches"></span>
+                </a>
+                <a href="#hotdogs" class="categoria-card fade-in">
+                    <span class="categoria-icon">🌭</span>
+                    <span class="categoria-nome">Hot Dog's</span>
+                    <span class="categoria-count" data-count-for="hotdogs"></span>
+                </a>
+                <a href="#porcoes" class="categoria-card fade-in">
+                    <span class="categoria-icon">🍟</span>
+                    <span class="categoria-nome">Porções</span>
+                    <span class="categoria-count" data-count-for="porcoes"></span>
+                </a>
+                <a href="#adicionais" class="categoria-card fade-in">
+                    <span class="categoria-icon">✨</span>
+                    <span class="categoria-nome">Adicionais</span>
+                    <span class="categoria-count" data-count-for="adicionais"></span>
+                </a>
+                <a href="#bebidas" class="categoria-card fade-in">
+                    <span class="categoria-icon">🥤</span>
+                    <span class="categoria-nome">Bebidas</span>
+                    <span class="categoria-count" data-count-for="bebidas"></span>
+                </a>
+            </div>
+        </section>
+
+        <section id="destaques" class="destaques-section">
+            <h2 class="fade-in">Destaques do Cardápio</h2>
+            <p class="section-legend">Uma seleção de pedidos queridinhos da casa</p>
+            <div class="destaques-grid">
+                <div class="menu-card destaque-card fade-in">
+                    <div class="destaque-media">🍔</div>
+                    <div class="item-details">
+                        <span class="item-name">X-TUDO</span>
+                        <span class="item-price">R$ 28,00</span>
+                    </div>
+                    <button class="add-to-cart-btn" data-name="X-Tudo" data-price="28.00">+</button>
+                </div>
+                <div class="menu-card destaque-card fade-in">
+                    <div class="destaque-media">🌭</div>
+                    <div class="item-details">
+                        <span class="item-name">DOG ESPECIAL</span>
+                        <span class="item-price">R$ 22,00</span>
+                    </div>
+                    <button class="add-to-cart-btn" data-name="Dog Especial" data-price="22.00">+</button>
+                </div>
+                <div class="menu-card destaque-card fade-in">
+                    <div class="destaque-media">🍟</div>
+                    <div class="item-details">
+                        <span class="item-name">BATATA FRITA COMPLETA</span>
+                        <span class="item-price">R$ 32,00</span>
+                    </div>
+                    <button class="add-to-cart-btn" data-name="Batata Completa (Inteira)" data-price="32.00">+</button>
+                </div>
+                <div class="menu-card destaque-card fade-in">
+                    <div class="destaque-media">🧃</div>
+                    <div class="item-details">
+                        <span class="item-name">SUCO NATURAL LARANJA</span>
+                        <span class="item-price">R$ 10,00</span>
+                    </div>
+                    <button class="add-to-cart-btn" data-name="Suco Natural Laranja 500ml" data-price="10.00">+</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="promo-banner-section">
+            <div class="promo-banner fade-in">
+                <span class="promo-icon">📱</span>
+                <h3>Peça pelo WhatsApp</h3>
+                <p>Atendimento rápido e direto, sem complicação.</p>
+                <a href="https://wa.me/5517992079103" target="_blank" rel="noopener"
+                    class="btn-hero btn-hero-primary">Chamar no WhatsApp</a>
+            </div>
+            <div class="promo-banner promo-banner-alt fade-in">
+                <span class="promo-icon">🛵</span>
+                <h3>Entrega ou Retirada</h3>
+                <p>Você escolhe como prefere receber o seu pedido.</p>
+                <a href="#lanches" class="btn-hero btn-hero-outline">Ver Cardápio</a>
+            </div>
+        </section>
 
         <section id="lanches">
             <h2 class="fade-in">🍔 Lanches e Burguer's</h2>

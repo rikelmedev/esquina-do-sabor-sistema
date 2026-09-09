@@ -22,6 +22,15 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
+// 1B. CONTAGEM REAL DE ITENS POR CATEGORIA (cards de "Explore por Categoria")
+document.querySelectorAll('.categoria-count').forEach(span => {
+    const section = document.getElementById(span.getAttribute('data-count-for'));
+    if (section) {
+        const count = section.querySelectorAll('.menu-card').length;
+        span.textContent = `${count} ${count === 1 ? 'item' : 'itens'}`;
+    }
+});
+
 // 2. CARRINHO
 let cart = [];
 const cartModal = document.getElementById('order-modal');
@@ -68,36 +77,62 @@ document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
     });
 });
 
+// Agrupa o carrinho (que guarda 1 entrada por unidade) em linhas por produto, só para exibição.
+function getGroupedCart() {
+    const grouped = [];
+    cart.forEach(item => {
+        const existing = grouped.find(g => g.name === item.name && g.price === item.price);
+        if (existing) existing.qty++;
+        else grouped.push({ name: item.name, price: item.price, qty: 1 });
+    });
+    return grouped;
+}
+
 function updateCart() {
     cartItemsContainer.innerHTML = '';
     let total = 0;
-    cart.forEach((item, index) => {
-        total += item.price;
+    const grouped = getGroupedCart();
+
+    if (grouped.length === 0) {
+        cartItemsContainer.innerHTML = '<p class="cart-empty">Seu carrinho está vazio.</p>';
+    }
+
+    grouped.forEach((item, index) => {
+        const subtotalItem = item.price * item.qty;
+        total += subtotalItem;
         const div = document.createElement('div');
         div.classList.add('cart-item');
         div.innerHTML = `
-            <span>${item.name} - R$ ${item.price.toFixed(2).replace('.', ',')}</span>
-            <button class="remove-item-btn" onclick="window.removeItem(${index})">❌</button>
+            <div class="cart-item-info">
+                <span class="cart-item-name">${item.name}</span>
+                <span class="cart-item-unit">R$ ${item.price.toFixed(2).replace('.', ',')} cada</span>
+            </div>
+            <div class="cart-item-controls">
+                <button class="qty-btn" data-index="${index}" data-action="dec">−</button>
+                <span class="qty-value">${item.qty}</span>
+                <button class="qty-btn" data-index="${index}" data-action="inc">+</button>
+                <span class="cart-item-subtotal">R$ ${subtotalItem.toFixed(2).replace('.', ',')}</span>
+            </div>
         `;
         cartItemsContainer.appendChild(div);
     });
-    
+
     const formatTotal = total.toFixed(2).replace('.', ',');
     cartTotalValue.innerText = formatTotal;
-    
+
     const count = cart.length;
-    
+
     // Atualiza a Barra Mobile
     if (document.getElementById('cart-count-bottom')) {
         document.getElementById('cart-count-bottom').innerText = count;
         document.getElementById('cart-total-bottom').innerText = formatTotal;
     }
-    
+
     // Atualiza a Bolinha do PC
     if (document.getElementById('cart-count')) {
         document.getElementById('cart-count').innerText = count;
     }
-    
+
     // Mostra ou esconde a barra no Mobile
     if (count > 0 && bottomCartBar) {
         bottomCartBar.classList.remove('hidden');
@@ -106,10 +141,22 @@ function updateCart() {
     }
 }
 
-window.removeItem = (index) => {
-    cart.splice(index, 1);
+// Delegação: um clique nos botões +/- do carrinho ajusta a quantidade daquele produto
+cartItemsContainer.addEventListener('click', (e) => {
+    const btn = e.target.closest('.qty-btn');
+    if (!btn) return;
+    const grouped = getGroupedCart();
+    const item = grouped[Number(btn.dataset.index)];
+    if (!item) return;
+
+    if (btn.dataset.action === 'inc') {
+        cart.push({ name: item.name, price: item.price });
+    } else {
+        const idx = cart.findIndex(i => i.name === item.name && i.price === item.price);
+        if (idx > -1) cart.splice(idx, 1);
+    }
     updateCart();
-};
+});
 
 // 3. ENVIO DE PEDIDO 
 document.getElementById('finalize-order-btn').addEventListener('click', async () => {
@@ -133,7 +180,7 @@ document.getElementById('finalize-order-btn').addEventListener('click', async ()
         await addDoc(collection(db, "pedidos"), novoPedido);
         
         let msg = `🍔 *PEDIDO RECEBIDO - ESQUINA DO SABOR*\n\n👤 *Cliente:* ${novoPedido.cliente}\n🛵 *Método:* ${novoPedido.metodo}\n📍 *Endereço:* ${novoPedido.endereco}\n💳 *Pagto:* ${novoPedido.pagamento}\n\n🛒 *Itens:*\n`;
-        novoPedido.itens.forEach(i => msg += `• ${i.name}\n`);
+        getGroupedCart().forEach(i => msg += `• ${i.qty}x ${i.name}\n`);
         msg += `\n💰 *Total: R$ ${cartTotalValue.innerText}*`;
         
         window.open(`https://api.whatsapp.com/send?phone=5517992079103&text=${encodeURIComponent(msg)}`);
@@ -153,8 +200,11 @@ document.getElementById('finalize-order-btn').addEventListener('click', async ()
 });
 
 // 4. MENU INTELIGENTE CORRIGIDO (SCROLL SPY)
-const sections = document.querySelectorAll('section');
 const navLinks = document.querySelectorAll('.nav-list li a');
+// Só considera as seções que têm link no menu (ignora hero/categorias/destaques)
+const sections = Array.from(navLinks)
+    .map(link => document.querySelector(link.getAttribute('href')))
+    .filter(Boolean);
 
 function updateScrollSpy() {
     let current = 'lanches'; 
