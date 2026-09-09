@@ -31,20 +31,30 @@ if (configUrl) configUrl.innerText = window.location.origin + "/garcom.html";
 let faturamentoFinalizado = 0;
 let faturamentoMesasAberto = 0;
 let totalDinheiro = 0, totalPix = 0, totalCredito = 0, totalDebito = 0, totalPedidosDia = 0;
+let faturamentoPorHora = new Array(24).fill(0);
 
 onSnapshot(query(collection(db, "pedidos"), orderBy("data", "desc")), (snapshot) => {
     if(colPendente) colPendente.innerHTML = "";
     if(colPreparando) colPreparando.innerHTML = "";
     if(colFinalizado) colFinalizado.innerHTML = "";
-    
+
     faturamentoFinalizado = totalDinheiro = totalPix = totalCredito = totalDebito = totalPedidosDia = 0;
+    faturamentoPorHora = new Array(24).fill(0);
+    const hojeStr = new Date().toDateString();
 
     snapshot.forEach((docSnap) => {
         const pedido = docSnap.data();
         if (pedido.status === "Finalizado") {
             faturamentoFinalizado += (pedido.total || 0);
             totalPedidosDia++;
-            
+
+            if (pedido.data && pedido.data.toDate) {
+                const dataPedido = pedido.data.toDate();
+                if (dataPedido.toDateString() === hojeStr) {
+                    faturamentoPorHora[dataPedido.getHours()] += (pedido.total || 0);
+                }
+            }
+
             if (pedido.pagamento === "Misto" && pedido.split) {
                 totalDinheiro += (pedido.split.dinheiro || 0);
                 totalPix += (pedido.split.pix || 0);
@@ -102,6 +112,39 @@ window.atualizarDashboard = () => {
             <span class="kpi-label">Caixa (Finalizados)</span><span class="kpi-value" style="color: #10b981; font-size: 1.6rem;">R$ ${faturamentoFinalizado.toFixed(2).replace('.', ',')}</span>
         </div>
     `;
+
+    const ctxLinha = document.getElementById('chartLinha');
+    if (ctxLinha) {
+        if (chartLinhaInstance) chartLinhaInstance.destroy();
+        const labelsHora = faturamentoPorHora.map((_, h) => `${String(h).padStart(2, '0')}h`);
+        chartLinhaInstance = new Chart(ctxLinha, {
+            type: 'line',
+            data: {
+                labels: labelsHora,
+                datasets: [{
+                    label: 'Faturamento por hora',
+                    data: faturamentoPorHora,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#3b82f6'
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148,163,184,0.1)' } },
+                    y: { beginAtZero: true, ticks: { color: '#94a3b8', callback: (value) => `R$ ${value}` }, grid: { color: 'rgba(148,163,184,0.1)' } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: (ctx) => `R$ ${ctx.parsed.y.toFixed(2).replace('.', ',')}` } }
+                }
+            }
+        });
+    }
 
     const ctxRosca = document.getElementById('chartRosca');
     if (ctxRosca) {
